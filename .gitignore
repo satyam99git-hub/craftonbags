@@ -1,0 +1,8 @@
+# Keeps generated files, dependencies, secrets, and local machine artifacts out of version control.
+
+node_modules/
+dist/
+build/
+.env
+uploads/
+*.log

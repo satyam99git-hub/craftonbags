@@ -1,0 +1,1 @@
+// Renders the storefront homepage.
