@@ -1,15 +1,10 @@
 import React from 'react'
-import Hometop from './components/ribbion/Hometop'
-import Navbar from './components/common/Navbar'
-import Hero from './components/home/Hero'
-
+import Home from "./pages/Home";
 
 function App() {
   return (
     <div className="min-h-screen">
-      <Hometop />
-      <Navbar />
-      <Hero />
+      <Home />
     </div>
   )
 }
