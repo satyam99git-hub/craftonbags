@@ -31,7 +31,7 @@ const Navbar = () => {
                         <div className=' flex justify-center gap-4'>
                             <div className='font-semibold text-xs flex flex-col items-center'><Heart strokeWidth={2} />Wishlist</div>
                             <div className='font-semibold text-xs flex flex-col items-center'><ShoppingCart strokeWidth={2} />Cart</div>
-                            <div className='font-semibold text-xs flex flex-col items-center'><CircleUserRound strokeWidth={2} />Wishlist</div>
+                            <div className='font-semibold text-xs flex flex-col items-center'><CircleUserRound strokeWidth={2} />Login</div>
                         </div>
     
                     </div>
