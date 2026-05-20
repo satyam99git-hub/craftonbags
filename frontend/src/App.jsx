@@ -1,17 +1,54 @@
-import React from 'react'
-import Home from "./pages/Home";
-import Hometop from './components/ribbion/Hometop';
-import Navbar from './components/common/Navbar';
+import React, {
+  useEffect,
+} from "react";
+
+import {
+  useLocation,
+} from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout";
+
+import AppRoutes from "./routes/AppRoutes";
+
+import AuthModal from "./components/auth/AuthModal";
+
+import useModal from "./hooks/useModal";
 
 function App() {
+  const location = useLocation();
+
+  const {
+    isOpen,
+    openModal,
+    closeModal,
+  } = useModal();
+
+  // Open modal automatically
+  useEffect(() => {
+    if (
+      location.pathname === "/login" ||
+      location.pathname === "/register"
+    ) {
+      openModal();
+    } else {
+      closeModal();
+    }
+  }, [location.pathname]);
+
   return (
-    <div className="min-h-screen">
-      <Hometop />
-            {/* nav */}
-            <Navbar />
-      <Home />
-    </div>
-  )
+    <>
+      <MainLayout
+        onOpenRegister={openModal}
+      >
+        <AppRoutes />
+      </MainLayout>
+
+      <AuthModal
+        isOpen={isOpen}
+        onClose={closeModal}
+      />
+    </>
+  );
 }
 
-export default App
+export default App;

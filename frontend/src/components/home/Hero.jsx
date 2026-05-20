@@ -6,7 +6,6 @@ import Hometop from "../ribbion/Hometop";
 const Hero = () => {
   return (
     <div>
-      
       <div
         className="relative w-full h-[540px] bg-cover bg-center flex items-center px-6 md:px-16 lg:px-24"
         style={{ backgroundImage: `url(${hero_bg})` }}
