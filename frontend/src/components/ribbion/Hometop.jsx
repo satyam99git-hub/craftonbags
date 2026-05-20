@@ -1,25 +1,35 @@
 import React from 'react'
-import { Truck, Gift, RefreshCw, Search, ChevronDown, Heart, ShoppingCart, CircleUserRound } from 'lucide-react'
+import { Truck, Gift, RefreshCw } from 'lucide-react'
+
 const Hometop = () => {
   return (
-    <div className="Top-part">
-                <div className="bg-black h-10 w-full pr-5 pl-5 flex items-center" >
-                    <div className=" w-full flex justify-between">
-                        <div className='text-amber-50 flex items-center '>
-                            <div className='p-1.5 text-amber-300'><Truck strokeWidth={1} /></div>
-                            <span className='text-sm'>Free Shipping on order above $50</span>
-                        </div>
-                        <div className='text-amber-50 flex items-center '>
-                            <div className='p-1.5 text-amber-300'><Gift strokeWidth={1} /></div>
-                            <span className='text-sm'>Get 10% Off on your first order | Use Code: CRAFT10</span>
-                        </div>
-                        <div className='text-amber-50 flex items-center '>
-                            <div className='p-1.5 text-amber-300'><RefreshCw strokeWidth={1} /></div>
-                            <span className='text-sm'>30-Day Easy Returns</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div className="w-full bg-neutral-900 border-b border-neutral-800 tracking-wide text-[13px] text-neutral-300 antialiased font-medium select-none">
+      <div className="max-w-7xl mx-auto h-10 px-4 flex items-center justify-between">
+        
+        {/* Left Side: Store Promises */}
+        <div className="hidden md:flex items-center gap-6">
+          <div className="flex items-center gap-2 group cursor-default">
+            <Truck size={15} className="text-amber-400 group-hover:translate-x-0.5 transition-transform duration-200" />
+            <span>Free shipping over $50</span>
+          </div>
+          <div className="h-3 w-[1px] bg-neutral-700" /> {/* Clean Divider */}
+          <div className="flex items-center gap-2 group cursor-default">
+            <RefreshCw size={14} className="text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
+            <span>30-day returns</span>
+          </div>
+        </div>
+
+        {/* Center / Right: Direct Call To Action */}
+        <div className="flex items-center gap-2 mx-auto md:mx-0 bg-neutral-800/50 px-3 py-1 rounded-full text-white text-xs border border-neutral-700/50">
+          <Gift size={14} className="text-amber-400 animate-pulse" />
+          <span>Get 10% Off your first order</span>
+          <span className="font-bold text-amber-300 ml-1 tracking-wider bg-black/40 px-1.5 py-0.5 rounded border border-amber-500/20 select-all cursor-pointer" title="Click to copy code">
+            CRAFT10
+          </span>
+        </div>
+
+      </div>
+    </div>
   )
 }
 
