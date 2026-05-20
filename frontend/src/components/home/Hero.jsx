@@ -1,14 +1,4 @@
 import React from "react";
-import {
-  Truck,
-  Gift,
-  RefreshCw,
-  Search,
-  ChevronDown,
-  Heart,
-  ShoppingCart,
-  CircleUserRound,
-} from "lucide-react";
 import hero_bg from "../../assets/images/hero_bg.png";
 import Navbar from "../common/Navbar";
 import Hometop from "../ribbion/Hometop";
@@ -16,9 +6,7 @@ import Hometop from "../ribbion/Hometop";
 const Hero = () => {
   return (
     <div>
-      <Hometop />
-      {/* nav */}
-      <Navbar />
+      
       <div
         className="relative w-full h-[540px] bg-cover bg-center flex items-center px-6 md:px-16 lg:px-24"
         style={{ backgroundImage: `url(${hero_bg})` }}
