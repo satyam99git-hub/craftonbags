@@ -8,6 +8,7 @@ import useRegister from "../../hooks/useRegister";
 
 const RegisterForm = ({
   onSwitchToLogin,
+  onSuccess,
 }) => {
   const {
     formData,
@@ -15,7 +16,9 @@ const RegisterForm = ({
     error,
     handleChange,
     handleSubmit,
-  } = useRegister();
+  } = useRegister({
+    onSuccess,
+  });
 
   return (
     <div className="mx-auto w-full max-w-lg">

@@ -1,8 +1,11 @@
 import { useState } from "react";
 
 import { loginUser } from "../features/auth/authAPI";
+import { saveAuth } from "../features/auth/authStorage";
 
-const useLogin = () => {
+const useLogin = ({
+  onSuccess,
+} = {}) => {
   const [loading, setLoading] =
     useState(false);
 
@@ -53,7 +56,8 @@ const useLogin = () => {
       const response =
         await loginUser(formData);
 
-      console.log(response);
+      saveAuth(response.data);
+      onSuccess?.(response.data);
 
     } catch (err) {
       setError(

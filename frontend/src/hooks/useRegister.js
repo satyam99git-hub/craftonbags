@@ -1,8 +1,11 @@
 import { useState } from "react";
 
 import { registerUser } from "../features/auth/authAPI";
+import { saveAuth } from "../features/auth/authStorage";
 
-const useRegister = () => {
+const useRegister = ({
+  onSuccess,
+} = {}) => {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
@@ -68,7 +71,8 @@ const useRegister = () => {
       const response =
         await registerUser(formData);
 
-      console.log(response);
+      saveAuth(response.data);
+      onSuccess?.(response.data);
 
     } catch (err) {
       setError(

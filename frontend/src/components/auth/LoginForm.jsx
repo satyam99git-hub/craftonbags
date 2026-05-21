@@ -9,6 +9,7 @@ import useLogin from "../../hooks/useLogin";
 
 const LoginForm = ({
   onSwitchToRegister,
+  onSuccess,
 }) => {
   const {
     formData,
@@ -16,7 +17,9 @@ const LoginForm = ({
     error,
     handleChange,
     handleSubmit,
-  } = useLogin();
+  } = useLogin({
+    onSuccess,
+  });
 
   return (
     <div className="w-full">
