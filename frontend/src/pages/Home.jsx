@@ -6,7 +6,8 @@ import Categories from '../components/home/Categories'
 import BackpackSection from '../components/home/BackpackSection'
 import SchoolSection from '../components/home/SchoolSection'
 import LuggageSection from '../components/home/LuggageSection'
-
+import InfluencerFavorite from '../components/home/InfluencerFavorites'
+import InfluencerFavorites from '../components/home/InfluencerFavorites'
 const Home = () => {
   return (
     <div className="min-h-screen">
@@ -16,6 +17,7 @@ const Home = () => {
       <BackpackSection />
       <SchoolSection />
       <LuggageSection />
+      <InfluencerFavorites/>
     </div>
   )
 }
