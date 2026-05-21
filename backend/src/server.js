@@ -4,6 +4,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const REQUIRED_ENV = ["MONGO_URI", "JWT_SECRET", "JWT_EXPIRE"];
+REQUIRED_ENV.forEach((key) => {
+  if (!process.env[key]) {
+    console.error(`Missing required environment variable: ${key}`);
+    process.exit(1);
+  }
+});
+
 connectDB();
 
 const PORT = process.env.PORT || 5000;
