@@ -27,7 +27,8 @@ export const registerService = async ({ name, email, password }) => {
 };
 
 export const loginService = async ({ email, password }) => {
-  const user = await User.findOne({ email });
+  // password is select:false on schema — must explicitly request it
+  const user = await User.findOne({ email }).select("+password");
   if (!user) {
     throw new ApiError(401, "Invalid credentials");
   }
