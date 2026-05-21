@@ -1,58 +1,65 @@
 import React from "react";
-
 import CollectionCard from "./CollectionCard";
 
 const collections = [
   {
     title: "Luxury Travel Bags",
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+    tagline: "First-class utility.",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop",
   },
-
   {
-    title: "Business Backpacks",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
+    title: "Executive Backpacks",
+    tagline: "Commute with status.",
+    image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop",
   },
-
   {
     title: "Weekend Duffles",
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop",
+    tagline: "Pack up and escape.",
+    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?q=80&w=800&auto=format&fit=crop",
   },
-
   {
-    title: "Minimal Laptop Bags",
-    image:
-      "https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop",
+    title: "Minimal Laptop Slings",
+    tagline: "Sleek tech protection.",
+    image: "https://images.unsplash.com/photo-1598532187856-327243147043?q=80&w=800&auto=format&fit=crop",
   },
 ];
 
 const CollectionGrid = () => {
   return (
-    <section className="px-6 py-14 lg:px-16">
+    <section className="px-6 py-16 lg:px-16 max-w-7xl mx-auto bg-white">
       
-      <div className="mb-10">
-        <h2 className="text-4xl font-bold text-zinc-900">
-          Featured Collections
-        </h2>
-
-        <p className="mt-2 text-zinc-500">
-          Explore curated collections tailored for every journey.
-        </p>
+      {/* Catchy E-commerce Header */}
+      <div className="mb-12 border-b border-zinc-100 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <span className="text-xs font-bold text-amber-700 uppercase tracking-widest block mb-2">
+            Seasonal Releases
+          </span>
+          <h2 className="text-3xl md:text-4xl font-black text-zinc-950 tracking-tight">
+            Featured Collections
+          </h2>
+          <p className="mt-2 text-sm text-zinc-500 max-w-xl">
+            Engineered for global transits, daily city commutes, and quick weekend getaways. Handcrafted detailing meets rugged utility.
+          </p>
+        </div>
+        
+        {/* Subtle marketing anchor to keep users exploring */}
+        <div className="text-xs font-bold text-zinc-400 uppercase tracking-wider hidden md:block select-none">
+          [ Edition 2026 ]
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
-        
+      {/* Balanced Grid Track Container */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {collections.map((item) => (
           <CollectionCard
             key={item.title}
             title={item.title}
+            tagline={item.tagline} // Pass down the premium sub-headline text
             image={item.image}
           />
         ))}
-
       </div>
+      
     </section>
   );
 };
