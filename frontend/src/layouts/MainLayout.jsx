@@ -1,4 +1,3 @@
-// Defines the public page layout with shared navigation, content, and footer areas.
 import React from "react";
 
 import Hometop from "../components/ribbion/Hometop";
@@ -10,13 +9,19 @@ const MainLayout = ({
 }) => {
   return (
     <div className="min-h-screen bg-stone-50">
+      
+      {/* Top Ribbon */}
       <Hometop />
 
+      {/* Sticky Navbar */}
       <Navbar
         onOpenRegister={onOpenRegister}
       />
 
-      {children}
+      {/* Main Content */}
+      <main>
+        {children}
+      </main>
     </div>
   );
 };
