@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { Link } from "react-router-dom";
 
 import NavLinks from "./NavLinks";
 import SearchBar from "./SearchBar";
@@ -74,9 +75,12 @@ const Navbar = ({
       
       {/* Logo */}
       <div className="flex justify-center">
-        <button className="text-3xl font-bold tracking-tight text-black">
+        <Link
+          to="/"
+          className="text-3xl font-bold tracking-tight text-black"
+        >
           CRAFTON
-        </button>
+        </Link>
       </div>
 
       {/* Links */}

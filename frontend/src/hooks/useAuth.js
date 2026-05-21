@@ -1,28 +1,98 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
+// Provides reusable authentication state and helper actions to components.
+import { useEffect, useState } from "react";
+
+import {
+  getCurrentUser,
+  logoutUser,
+} from "../features/auth/authAPI";
+import {
+  clearAuth,
+  getStoredAuth,
+  saveAuth,
+} from "../features/auth/authStorage";
 
 const useAuth = () => {
-  const navigate = useNavigate();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return !!localStorage.getItem("token");
-  });
+  const [auth, setAuth] = useState(() =>
+    getStoredAuth()
+  );
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    const syncAuth = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
+    let isMounted = true;
+
+    const syncAuth = async () => {
+      try {
+        const response =
+          await getCurrentUser();
+
+        if (!isMounted) return;
+
+        saveAuth(response.data);
+        setAuth(response.data);
+      } catch {
+        if (!isMounted) return;
+
+        clearAuth();
+        setAuth(null);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     };
-    window.addEventListener("storage", syncAuth);
-    return () => window.removeEventListener("storage", syncAuth);
+
+    syncAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    navigate("/");
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setAuth(getStoredAuth());
+    };
+
+    window.addEventListener(
+      "auth-change",
+      handleAuthChange
+    );
+    window.addEventListener(
+      "storage",
+      handleAuthChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "auth-change",
+        handleAuthChange
+      );
+      window.removeEventListener(
+        "storage",
+        handleAuthChange
+      );
+    };
+  }, []);
+
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } finally {
+      clearAuth();
+      setAuth(null);
+    }
   };
 
-  return { isLoggedIn, logout };
+  return {
+    auth,
+    loading,
+    user: auth?.user || null,
+    isAuthenticated: Boolean(auth?.user),
+    logout,
+  };
+
 };
 
 export default useAuth;

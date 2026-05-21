@@ -78,6 +78,11 @@ const AuthModal = ({
     navigate("/");
   };
 
+  const handleAuthSuccess = () => {
+    onClose();
+    navigate("/");
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -137,12 +142,14 @@ const AuthModal = ({
             
             {mode === "login" ? (
               <LoginForm
+                onSuccess={handleAuthSuccess}
                 onSwitchToRegister={() =>
                   navigate("/register")
                 }
               />
             ) : (
               <RegisterForm
+                onSuccess={handleAuthSuccess}
                 onSwitchToLogin={() =>
                   navigate("/login")
                 }

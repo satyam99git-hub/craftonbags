@@ -2,9 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { registerUser } from "../features/auth/authAPI";
+import { saveAuth } from "../features/auth/authStorage";
 
-const useRegister = () => {
-  const navigate = useNavigate();
+
+const useRegister = ({
+  onSuccess,
+} = {}) => {
+  const [loading, setLoading] = useState(false);
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,9 +58,12 @@ const useRegister = () => {
     try {
       setLoading(true);
 
-      // Strip UI-only fields before sending to API
-      const { confirmPassword, agreeToTerms, ...payload } = formData;
-      const response = await registerUser(payload);
+      const response =
+        await registerUser(formData);
+
+      saveAuth(response.data);
+      onSuccess?.(response.data);
+
 
       localStorage.setItem("token", response.data.token);
       navigate("/");

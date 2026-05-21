@@ -2,11 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { loginUser } from "../features/auth/authAPI";
+import { saveAuth } from "../features/auth/authStorage";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const useLogin = () => {
-  const navigate = useNavigate();
+const useLogin = ({
+  onSuccess,
+} = {}) => {
+  const [loading, setLoading] =
+    useState(false);
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +47,12 @@ const useLogin = () => {
     try {
       setLoading(true);
 
-      const response = await loginUser(formData);
+      const response =
+        await loginUser(formData);
+
+      saveAuth(response.data);
+      onSuccess?.(response.data);
+
 
       localStorage.setItem("token", response.data.token);
       navigate("/");
