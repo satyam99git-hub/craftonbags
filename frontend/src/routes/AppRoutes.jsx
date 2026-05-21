@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 import Home from "../pages/Home";
+import Collection from "../pages/Collection";
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,11 @@ const AppRoutes = () => {
         path="/register"
         element={<Home />}
       />
+
+      <Route
+  path="/collection"
+  element={<Collection />}
+/>
     </Routes>
   );
 };

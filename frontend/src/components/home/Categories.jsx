@@ -1,6 +1,5 @@
-// Renders featured shopping categories on the homepage.
 import React from "react";
-import CategoryCard from "./CategoriesCard"; // Double-check if your filename is CategoriesCard.jsx or CategoryCard.jsx
+import CategoryCard from "./CategoriesCard";
 
 const categories = [
   {
@@ -15,17 +14,17 @@ const categories = [
   },
   {
     title: "Travel Duffle Bags",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600&auto=format&fit=crop", // Replaced with a placeholder or custom asset
+    image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=600", 
     bgColor: "bg-blue-100"
   },
   {
     title: "Crossbody Bags",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=600",
     bgColor: "bg-rose-100"
   },
   {
     title: "Minimalist Wallets",
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=600",
     bgColor: "bg-stone-100"
   }
 ];
@@ -39,11 +38,11 @@ const Categories = () => {
           Shop By Category
         </h2>
         <p className="mt-2 text-sm text-zinc-500">
-          Explore premium travel and lifestyle collections designed for utility.
+          Explore premium travel and lifestyle collections designed for modern utility.
         </p>
       </div>
 
-      {/* Fully balanced layout structure mapping 5 continuous items across 5 responsive screen spaces */}
+      {/* Smooth fluid layout responsive scaling engine track wrapper mapping */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {categories.map((category) => (
           <CategoryCard

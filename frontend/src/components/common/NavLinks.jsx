@@ -1,18 +1,36 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import { NAV_LINKS } from "../../constants/navigation";
 
 const NavLinks = () => {
   return (
     <div className="flex items-center gap-8">
       {NAV_LINKS.map((link) => (
-        <button
+        <NavLink
           key={link.id}
-          className="relative font-medium text-gray-600 hover:text-black cursor-pointer py-1 transition-colors duration-200 group text-sm"
+          to={link.path}
+          className={({ isActive }) =>
+            `relative py-1 text-sm font-medium transition-colors duration-200 group ${
+              isActive
+                ? "text-black"
+                : "text-gray-600 hover:text-black"
+            }`
+          }
         >
-          {link.label}
+          {({ isActive }) => (
+            <>
+              {link.label}
 
-          <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-black transition-all duration-300 ease-out -translate-x-1/2 group-hover:w-full" />
-        </button>
+              <span
+                className={`absolute bottom-0 left-1/2 h-[2px] bg-black transition-all duration-300 ease-out -translate-x-1/2 ${
+                  isActive
+                    ? "w-full"
+                    : "w-0 group-hover:w-full"
+                }`}
+              />
+            </>
+          )}
+        </NavLink>
       ))}
     </div>
   );
