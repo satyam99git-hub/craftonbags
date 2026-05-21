@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+import authRoutes from "./routes/auth.routes.js";
+import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -29,5 +31,9 @@ app.get("/api/health", (_req, res) => {
     service: "craftonbags-backend",
   });
 });
+
+app.use("/api/auth", authRoutes);
+
+app.use(errorMiddleware);
 
 export default app;

@@ -1,1 +1,49 @@
-// Handles authentication request logic such as register, login, logout, and current user.
+import asyncHandler from "../utils/asyncHandler.js";
+import { registerService, loginService } from "../services/auth.service.js";
+
+export const register = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const data = await registerService({ name, email, password });
+
+  res.status(201).json({
+    success: true,
+    message: "Registration successful",
+    data,
+  });
+});
+
+export const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const data = await loginService({ email, password });
+
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    data,
+  });
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+});
+
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    },
+  });
+});
