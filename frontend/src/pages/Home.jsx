@@ -10,7 +10,7 @@ import InfluencerFavorite from '../components/home/InfluencerFavorites'
 import InfluencerFavorites from '../components/home/InfluencerFavorites'
 const Home = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <Hero />
       <Categories />
       <FeaturedProducts />

@@ -70,7 +70,7 @@ const BackpackSection = () => {
   const [activeTab, setActiveTab] = useState("PROFESSIONAL");
 
   return (
-    <section className="bg-white px-4 py-16 md:px-8 lg:px-16 max-w-7xl mx-auto">
+    <section className="bg-white px-4 py-16 sm:px-6 md:px-8 lg:px-16 max-w-7xl mx-auto">
       
       {/* Dynamic Subheading Tag */}
       <div className="flex items-center justify-center gap-3 mb-2">

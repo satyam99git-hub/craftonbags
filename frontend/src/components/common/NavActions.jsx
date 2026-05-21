@@ -27,7 +27,7 @@ const NavActions = ({
   };
 
   return (
-    <div className="flex justify-center gap-6">
+    <div className="flex justify-center gap-4 sm:gap-6">
       
       <button className="group font-medium text-xs flex flex-col items-center gap-1 text-slate-600 hover:text-rose-600 transition-all duration-300">
         <Heart className="w-5 h-5 group-hover:scale-110 transition-all" />

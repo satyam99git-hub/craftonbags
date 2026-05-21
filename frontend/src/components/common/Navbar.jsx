@@ -62,7 +62,7 @@ const Navbar = ({
 
   return (
     <header
-      className={`sticky top-0 z-50 flex h-16 w-full items-center justify-between gap-8 px-5 transition-all duration-300 ${
+      className={`sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 px-4 py-2 sm:px-5 transition-all duration-300 ${
         showNavbar
           ? "translate-y-0"
           : "-translate-y-full"

@@ -29,7 +29,7 @@ const VideoCard = ({ product }) => {
 
   return (
     <div
-      className="w-[240px] md:w-[260px] flex-shrink-0 snap-start group relative py-2"
+      className="w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px] flex-shrink-0 snap-start group relative py-2"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -67,7 +67,7 @@ const VideoCard = ({ product }) => {
 
 const InfluencerSection = () => {
   return (
-    <section className="bg-[#f5f5f5] px-4 py-20 md:px-8 lg:px-16 max-w-7xl mx-auto rounded-3xl my-6">  
+    <section className="bg-[#f5f5f5] px-4 py-20 sm:px-6 md:px-8 lg:px-16 max-w-7xl mx-auto rounded-3xl my-6">  
       {/* ⚡ Header (Clean & Centered Title Only) */}
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-black tracking-wide text-gray-900 uppercase leading-none">
@@ -76,7 +76,7 @@ const InfluencerSection = () => {
       </div>
 
       {/* 🎒 Pure Native Scroll/Touchpad Runway Track */}
-      <div className="skybags-custom-scrollbar mt-8 flex gap-5 overflow-x-auto pb-4 pr-4 md:pr-12 snap-x snap-mandatory overscroll-behavior-x-contain scroll-smooth">
+      <div className="skybags-custom-scrollbar mt-8 flex gap-4 sm:gap-5 overflow-x-auto pb-4 pr-4 md:pr-12 snap-x snap-mandatory overscroll-behavior-x-contain scroll-smooth">
         <style dangerouslySetInnerHTML={{__html: `
           .skybags-custom-scrollbar::-webkit-scrollbar {
             height: 4px;

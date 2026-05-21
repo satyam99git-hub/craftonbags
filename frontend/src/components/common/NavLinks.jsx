@@ -4,7 +4,7 @@ import { NAV_LINKS } from "../../constants/navigation";
 
 const NavLinks = () => {
   return (
-    <div className="flex items-center gap-8">
+    <div className="flex flex-wrap items-center gap-4 justify-center text-sm overflow-x-auto whitespace-nowrap sm:overflow-visible sm:whitespace-normal">
       {NAV_LINKS.map((link) => (
         <NavLink
           key={link.id}

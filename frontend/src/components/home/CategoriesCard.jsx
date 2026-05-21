@@ -10,7 +10,7 @@ const CategoryCard = ({
 
   return (
     <div
-      className={`group relative h-[300px] w-full overflow-hidden rounded-3xl ${bgColor} cursor-pointer 
+      className={`group relative h-[280px] sm:h-[300px] md:h-[320px] w-full overflow-hidden rounded-3xl ${bgColor} cursor-pointer 
       border border-zinc-100/50 shadow-sm 
       transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] 
       hover:-translate-y-1.5 hover:shadow-xl hover:shadow-zinc-300/40`}

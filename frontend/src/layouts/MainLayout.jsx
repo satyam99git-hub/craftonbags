@@ -19,7 +19,7 @@ const MainLayout = ({
       />
 
       {/* Main Content */}
-      <main>
+      <main className="overflow-x-hidden">
         {children}
       </main>
     </div>

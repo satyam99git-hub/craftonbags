@@ -78,7 +78,7 @@ const FeaturedProducts = () => {
   }, [isPaused]);
 
   return (
-    <div className="w-full bg-stone-50 py-16 overflow-hidden select-none">
+    <div className="w-full bg-stone-50 py-16 overflow-hidden select-none px-4 sm:px-6 md:px-12 lg:px-16">
       
       {/* Title Header */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 mb-10">
@@ -109,7 +109,7 @@ const FeaturedProducts = () => {
           {loopProducts.map((product, index) => (
             <article 
               key={`${product.id}-${index}`} 
-              className="relative flex flex-col flex-shrink-0 w-[260px] sm:w-[320px] md:w-[360px] lg:w-[400px]"
+              className="relative flex flex-col flex-shrink-0 w-[220px] sm:w-[260px] md:w-[320px] lg:w-[360px]"
             >
               
               {/* IMAGE FRAME (Enforced 16:9 Ratio Aspect Card Block) */}

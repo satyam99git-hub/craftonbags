@@ -7,7 +7,7 @@ const Hero = () => {
   return (
     <div>
       <div
-        className="relative w-full h-[540px] bg-cover bg-center flex items-center px-6 md:px-16 lg:px-24"
+        className="relative w-full h-[420px] sm:h-[520px] md:h-[540px] lg:h-[580px] bg-cover bg-center flex items-center px-4 sm:px-6 md:px-16 lg:px-24"
         style={{ backgroundImage: `url(${hero_bg})` }}
       >
         {/* Content Wrapper */}

@@ -71,7 +71,7 @@ const LuggageSection = () => {
         </h2>
       </div>
 
-      <div className="relative mx-auto mt-10 flex max-w-md items-center justify-center gap-8 border-b border-zinc-200">
+      <div className="relative mx-auto mt-10 flex max-w-full items-center justify-center gap-6 sm:gap-8 border-b border-zinc-200 px-2 sm:px-0">
         {categories.map((item) => (
           <button
             key={item}
@@ -95,7 +95,7 @@ const LuggageSection = () => {
       <div className="mt-14 min-h-[460px]">
         <div
           key={activeTab}
-          className="grid grid-cols-1 gap-6 animate-[fadeLift_0.3s_ease-out_both] sm:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 animate-[fadeLift_0.3s_ease-out_both]"
         >
           <style
             dangerouslySetInnerHTML={{

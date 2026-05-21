@@ -30,12 +30,12 @@ const SchoolSection = () => {
   };
 
   return (
-    <section className="bg-[#f5f5f5] py-24 pl-4 pr-4 md:pl-12 md:pr-0 max-w-7xl mx-auto overflow-hidden relative select-none">
+    <section className="bg-[#f5f5f5] py-20 sm:py-24 pl-4 pr-4 md:pl-12 md:pr-0 max-w-7xl mx-auto overflow-hidden relative select-none">
       
       {/* ⚡ Structural Column Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between pr-4 md:pr-12 border-b border-zinc-300 pb-8 gap-6">
   <div>
-    <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-zinc-950 uppercase leading-none">
+    <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-zinc-950 uppercase leading-none">
       CAMPUS EDIT
     </h2>
     <p className="text-xs font-bold text-zinc-400 mt-2 tracking-[0.2em] uppercase">
@@ -81,7 +81,7 @@ const SchoolSection = () => {
       <div 
         ref={scrollContainerRef}
         key={activeTab}
-        className="mt-12 flex gap-6 overflow-x-auto pb-8 pr-4 md:pr-12 scrollbar-none snap-x snap-mandatory animate-[slideIn_0.4s_ease-out_both]"
+        className="mt-12 flex gap-4 sm:gap-6 overflow-x-auto pb-8 pr-4 md:pr-12 scrollbar-none snap-x snap-mandatory animate-[slideIn_0.4s_ease-out_both]"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <style dangerouslySetInnerHTML={{__html: `
@@ -99,7 +99,7 @@ const SchoolSection = () => {
           return (
             <div 
               key={product.name} 
-              className="w-[290px] md:w-[340px] flex-shrink-0 snap-start group relative bg-white border border-zinc-200 p-4 rounded-2xl transition-all duration-300 hover:border-zinc-950 hover:shadow-xl"
+              className="w-[240px] sm:w-[280px] md:w-[320px] flex-shrink-0 snap-start group relative bg-white border border-zinc-200 p-4 rounded-2xl transition-all duration-300 hover:border-zinc-950 hover:shadow-xl"
             >
               
               {/* Product Media Asset Framer */}
@@ -157,7 +157,7 @@ const SchoolSection = () => {
         })}
 
         {/* End of Lineup Dynamic Promo Card */}
-        <div className="w-[260px] flex-shrink-0 snap-start bg-zinc-950 text-white rounded-2xl p-6 flex flex-col justify-between text-left border border-zinc-950">
+        <div className="w-[240px] sm:w-[260px] flex-shrink-0 snap-start bg-zinc-950 text-white rounded-2xl p-6 flex flex-col justify-between text-left border border-zinc-950">
           <div>
             <div className="text-[28px] font-black tracking-tighter uppercase italic leading-none mt-4">
               END OF <br />THIS LINE.
