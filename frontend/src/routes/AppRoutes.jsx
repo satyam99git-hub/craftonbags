@@ -6,6 +6,8 @@ import {
 
 import Home from "../pages/Home";
 import Collection from "../pages/Collection";
+import Profile from "../pages/Profile";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -26,9 +28,18 @@ const AppRoutes = () => {
       />
 
       <Route
-  path="/collection"
-  element={<Collection />}
-/>
+        path="/collection"
+        element={<Collection />}
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

@@ -79,8 +79,11 @@ const AuthModal = ({
   };
 
   const handleAuthSuccess = () => {
+    const redirectTo =
+      location.state?.from?.pathname || "/";
+
     onClose();
-    navigate("/");
+    navigate(redirectTo, { replace: true });
   };
 
   if (!isOpen) return null;

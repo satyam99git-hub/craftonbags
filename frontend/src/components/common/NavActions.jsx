@@ -4,21 +4,22 @@ import {
   Heart,
   ShoppingCart,
   CircleUserRound,
-  LogOut,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 const NavActions = ({
   onOpenAuth,
 }) => {
+  const navigate = useNavigate();
+
   const {
     isAuthenticated,
-    logout,
   } = useAuth();
 
   const handleAccountClick = () => {
     if (isAuthenticated) {
-      logout();
+      navigate("/profile");
       return;
     }
 
@@ -42,14 +43,10 @@ const NavActions = ({
         onClick={handleAccountClick}
         className="group font-medium text-xs flex flex-col items-center gap-1 text-slate-600 hover:text-emerald-600 transition-all duration-300"
       >
-        {isAuthenticated ? (
-          <LogOut className="w-5 h-5 group-hover:scale-110 transition-all" />
-        ) : (
-          <CircleUserRound className="w-5 h-5 group-hover:scale-110 transition-all" />
-        )}
+        <CircleUserRound className="w-5 h-5 group-hover:scale-110 transition-all" />
         <span>
           {isAuthenticated
-            ? "Logout"
+            ? "Profile"
             : "Sign In"}
         </span>
       </button>

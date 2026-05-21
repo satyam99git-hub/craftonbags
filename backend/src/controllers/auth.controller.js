@@ -64,6 +64,10 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone,
+        addresses: user.addresses,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     },
   });
