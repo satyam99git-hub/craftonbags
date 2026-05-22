@@ -8,6 +8,8 @@ import SchoolSection from '../components/home/SchoolSection'
 import LuggageSection from '../components/home/LuggageSection'
 import InfluencerFavorite from '../components/home/InfluencerFavorites'
 import InfluencerFavorites from '../components/home/InfluencerFavorites'
+import Footer from '../components/common/Footer'
+
 const Home = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
@@ -18,6 +20,7 @@ const Home = () => {
       <SchoolSection />
       <LuggageSection />
       <InfluencerFavorites/>
+      <Footer/>
     </div>
   )
 }
