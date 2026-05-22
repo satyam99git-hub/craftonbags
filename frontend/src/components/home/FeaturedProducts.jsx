@@ -1,186 +1,258 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Heart, ShoppingBag, Star } from 'lucide-react'
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Heart,
+  ShoppingBag,
+  Star,
+  ArrowRight,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const products = [
-  {
-    id: 1,
-    name: "The Premium Commuter Backpack",
-    category: "Backpacks",
-    price: 129.00,
-    rating: 4.9,
-    reviews: 124,
-    tag: "Bestseller",
-    image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 2,
-    name: "Weekender Aviator Duffel Bag",
-    category: "Travel Bags",
-    price: 185.00,
-    rating: 4.8,
-    reviews: 92,
-    tag: "New",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 3,
-    name: "Classic Over-the-Shoulder Tote",
-    category: "Totes",
-    price: 145.00,
-    rating: 5.0,
-    reviews: 67,
-    tag: "Limited",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 4,
-    name: "Minimalist City Crossbody Pack",
-    category: "Travel Bags",
-    price: 78.00,
-    rating: 4.7,
-    reviews: 43,
-    tag: null,
-    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
-  }
-]
-
-// Duplicate products to allow a continuous loop appearance
-const loopProducts = [...products, ...products, ...products];
+import product from "../../data/product";
 
 const FeaturedProducts = () => {
-  const [wishlist, setWishlist] = useState({})
-  const [offset, setOffset] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const trackRef = useRef(null)
+  const navigate = useNavigate();
 
+  const [wishlist, setWishlist] = useState({});
+  const [offset, setOffset] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const trackRef = useRef(null);
+
+  // Featured products only
+  const featuredProducts = product.productsFeatured.filter(
+    (product) => product.featured
+  );
+
+  // Infinite loop products
+  const loopProducts = [
+    ...featuredProducts,
+    ...featuredProducts,
+    ...featuredProducts,
+  ];
+
+  // Wishlist Toggle
   const toggleWishlist = (id, e) => {
-    e.stopPropagation()
-    setWishlist(prev => ({ ...prev, [id]: !prev[id] }))
-  }
+    e.stopPropagation();
 
-  // Pure JavaScript loop logic running on animation frames
+    setWishlist((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  // Auto Infinite Scroll
   useEffect(() => {
     let animationFrameId;
 
-    const updateLoop = () => {
+    const animate = () => {
       if (!isPaused && trackRef.current) {
-        setOffset((prevOffset) => {
-          const maxScroll = trackRef.current.scrollWidth / 3; // Calculate base size boundary
-          const nextOffset = prevOffset + 1; // Animation speed multiplier
-          return nextOffset >= maxScroll ? 0 : nextOffset;
+        setOffset((prev) => {
+          const maxScroll =
+            trackRef.current.scrollWidth / 3;
+
+          const next = prev + 0.7;
+
+          return next >= maxScroll ? 0 : next;
         });
       }
-      animationFrameId = requestAnimationFrame(updateLoop);
+
+      animationFrameId =
+        requestAnimationFrame(animate);
     };
 
-    animationFrameId = requestAnimationFrame(updateLoop);
-    return () => cancelAnimationFrame(animationFrameId);
+    animationFrameId =
+      requestAnimationFrame(animate);
+
+    return () =>
+      cancelAnimationFrame(animationFrameId);
   }, [isPaused]);
 
+  // Product Open
+  const handleOpenProduct = (id) => {
+    navigate(`/product/${id}`);
+  };
+
   return (
-    <div className="w-full bg-stone-50 py-16 overflow-hidden select-none px-4 sm:px-6 md:px-12 lg:px-16">
-      
-      {/* Title Header */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 mb-10">
-        <span className="text-xs font-bold uppercase tracking-widest text-amber-700 block mb-2">
-          Curated Collection
-        </span>
-        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-950">
-          Featured Products
-        </h2>
-      </div>
+    <section className="relative overflow-hidden bg-stone-50 py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 lg:px-16">
 
-      {/* Primary Mask Outer Box */}
-      <div 
-        className="relative w-full overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {/* Soft edge-gradient masks to visually fade card entries */}
-        <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-stone-50 to-transparent z-20 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-stone-50 to-transparent z-20 pointer-events-none" />
+        {/* Header */}
+        <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          
+          <div>
+            <span className="mb-3 block text-[11px] font-black uppercase tracking-[0.3em] text-amber-700">
+              Curated Collection
+            </span>
 
-        {/* X-Axis Motion Ribbon Track */}
-        <div 
-          ref={trackRef}
-          className="flex gap-6 flex-nowrap w-max"
-          style={{ transform: `translateX(-${offset}px)` }}
-        >
-          {loopProducts.map((product, index) => (
-            <article 
-              key={`${product.id}-${index}`} 
-              className="relative flex flex-col flex-shrink-0 w-[220px] sm:w-[260px] md:w-[320px] lg:w-[360px]"
-            >
-              
-              {/* IMAGE FRAME (Enforced 16:9 Ratio Aspect Card Block) */}
-              <div className="relative aspect-[16/9] w-full bg-zinc-200 rounded-2xl overflow-hidden shadow-sm border border-zinc-100 group">
-                
-                {product.tag && (
-                  <span className="absolute top-3 left-3 z-10 bg-zinc-950 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
-                    {product.tag}
-                  </span>
-                )}
+            <h2 className="max-w-2xl text-3xl font-black tracking-tight text-zinc-950 md:text-5xl">
+              Featured Products
+            </h2>
 
-                {/* Wishlist Button */}
-                <button 
-                  onClick={(e) => toggleWishlist(product.id, e)}
-                  className="absolute top-3 right-3 z-10 p-2.5 rounded-full bg-white text-zinc-600 hover:text-rose-600 shadow-sm active:scale-90 transition-all duration-200 cursor-pointer"
-                  type="button"
-                >
-                  <Heart 
-                    size={15} 
-                    strokeWidth={2.5} 
-                    className={wishlist[product.id] ? "fill-rose-500 text-rose-500" : ""}
-                  />
-                </button>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-500">
+              Explore our premium handcrafted bags
+              designed for professionals, travelers,
+              and modern lifestyles.
+            </p>
+          </div>
 
-                {/* Image */}
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500 ease-out"
-                  loading="lazy"
-                />
-
-                {/* Hover Add Button */}
-                <div className="absolute inset-x-3 bottom-3 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out flex gap-2 z-10">
-                  <button className="flex-1 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold text-xs py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer">
-                    <ShoppingBag size={13} />
-                    Quick Add
-                  </button>
-                </div>
-
-              </div>
-
-              {/* Data Meta Details */}
-              <div className="mt-4 flex flex-col flex-1 px-1">
-                <span className="text-xs text-zinc-400 font-medium tracking-wide">
-                  {product.category}
-                </span>
-                
-                <h3 className="mt-1 font-semibold text-sm md:text-base text-zinc-900 truncate pr-4 cursor-pointer">
-                  {product.name}
-                </h3>
-
-                <div className="mt-2 flex items-center justify-between gap-2 border-t border-zinc-100 pt-2.5">
-                  <span className="font-bold text-sm text-zinc-950">
-                    ${product.price.toFixed(2)}
-                  </span>
-                  
-                  <div className="flex items-center gap-1">
-                    <Star size={13} className="fill-amber-400 text-amber-400" />
-                    <span className="text-xs font-bold text-zinc-800">{product.rating}</span>
-                  </div>
-                </div>
-              </div>
-
-            </article>
-          ))}
+          {/* View All */}
+          <button
+            type="button"
+            className="group flex items-center gap-2 rounded-2xl border border-zinc-300 bg-white px-5 py-3 text-xs font-bold uppercase tracking-wider text-zinc-900 transition-all duration-300 hover:border-black hover:bg-black hover:text-white"
+          >
+            View All
+            <ArrowRight
+              size={15}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </button>
         </div>
 
-      </div>
-    </div>
-  )
-}
+        {/* Slider */}
+        <div
+          className="relative overflow-hidden"
+          onMouseEnter={() =>
+            setIsPaused(true)
+          }
+          onMouseLeave={() =>
+            setIsPaused(false)
+          }
+        >
+          {/* Gradient Mask */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-20 bg-gradient-to-r from-stone-50 to-transparent" />
 
-export default FeaturedProducts
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-20 bg-gradient-to-l from-stone-50 to-transparent" />
+
+          {/* Track */}
+          <div
+            ref={trackRef}
+            className="flex w-max gap-6"
+            style={{
+              transform: `translateX(-${offset}px)`,
+            }}
+          >
+            {loopProducts.map(
+              (product, index) => (
+                <article
+                  key={`${product.id}-${index}`}
+                  onClick={() =>
+                    handleOpenProduct(product.id)
+                  }
+                  className="group relative flex w-[250px] cursor-pointer flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl sm:w-[280px] md:w-[320px]"
+                >
+                  {/* Image */}
+                  <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+                    
+                    {/* Tag */}
+                    {product.tag && (
+                      <span className="absolute left-4 top-4 z-10 rounded-full bg-black px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                        {product.tag}
+                      </span>
+                    )}
+
+                    {/* Wishlist */}
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        toggleWishlist(
+                          product.id,
+                          e
+                        )
+                      }
+                      className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-zinc-700 shadow-md backdrop-blur-md transition-all duration-300 hover:text-rose-500"
+                    >
+                      <Heart
+                        size={18}
+                        className={
+                          wishlist[
+                            product.id
+                          ]
+                            ? "fill-rose-500 text-rose-500"
+                            : ""
+                        }
+                      />
+                    </button>
+
+                    {/* Product Image */}
+                    <img
+                      src={product.images?.[0]}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-x-4 bottom-4 translate-y-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <button
+                        type="button"
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-3 text-xs font-bold uppercase tracking-wider text-white"
+                      >
+                        <ShoppingBag size={14} />
+                        Quick View
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex flex-1 flex-col p-5">
+                    
+                    {/* Category */}
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                      {product.category}
+                    </span>
+
+                    {/* Title */}
+                    <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-zinc-950 transition-colors duration-300 group-hover:text-amber-700">
+                      {product.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-zinc-500">
+                      {product.description}
+                    </p>
+
+                    {/* Bottom */}
+                    <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
+                      
+                      {/* Price */}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          
+                          <span className="text-lg font-black text-zinc-950">
+                            ₹
+                            {product.price.toLocaleString()}
+                          </span>
+
+                          {product.originalPrice && (
+                            <span className="text-sm text-zinc-400 line-through">
+                              ₹
+                              {product.originalPrice.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1">
+                        <Star
+                          size={13}
+                          className="fill-amber-400 text-amber-400"
+                        />
+
+                        <span className="text-xs font-bold text-zinc-800">
+                          {product.rating}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeaturedProducts;

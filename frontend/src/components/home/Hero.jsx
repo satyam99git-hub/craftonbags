@@ -2,6 +2,7 @@ import React from "react";
 import hero_bg from "../../assets/images/hero_bg.png";
 import Navbar from "../common/Navbar";
 import Hometop from "../ribbion/Hometop";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -26,7 +27,12 @@ const Hero = () => {
           {/* Elegant Interactive Shop Button */}
           <div className="mt-8">
             <button className="group relative inline-flex items-center justify-center bg-white text-black font-semibold text-sm px-8 py-3.5 rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 cursor-pointer">
-              <span className="relative z-10">Shop Collection</span>
+              <Link
+  to="/shop"
+  className="relative z-10"
+>
+  Shop Collection
+</Link>
               {/* Subtle sliding background hover layer */}
               <div className="absolute inset-0 bg-neutral-100 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </button>
