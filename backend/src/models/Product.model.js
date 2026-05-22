@@ -1,58 +1,104 @@
-// Defines the product schema for catalog data, pricing, stock, and images.
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
       required: true,
       trim: true,
     },
+
     slug: {
       type: String,
       required: true,
-      trim: true,
       unique: true,
-      lowercase: true,
     },
+
+    brand: {
+      type: String,
+      default: "CRAFTON",
+    },
+
+    category: {
+      type: String,
+      required: true,
+    },
+
+    subCategory: {
+      type: String,
+    },
+
     description: {
       type: String,
-      default: "",
+      required: true,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      default: null,
-    },
+
     price: {
       type: Number,
       required: true,
-      min: 0,
     },
-    oldPrice: {
+
+    originalPrice: {
+      type: Number,
+    },
+
+    discountPercentage: {
       type: Number,
       default: 0,
-      min: 0,
     },
-    images: {
-      type: [String],
-      default: [],
-    },
+
     stock: {
       type: Number,
       default: 0,
-      min: 0,
     },
-    featured: {
+
+    sku: {
+      type: String,
+      unique: true,
+    },
+
+    images: [
+      {
+        url: String,
+        alt: String,
+      },
+    ],
+
+    specifications: {
+      material: String,
+      capacity: String,
+      dimensions: String,
+      weight: String,
+      laptopSize: String,
+    },
+
+    features: [String],
+
+    colors: [String],
+
+    ratingsAverage: {
+      type: Number,
+      default: 0,
+    },
+
+    ratingsCount: {
+      type: Number,
+      default: 0,
+    },
+
+    isFeatured: {
       type: Boolean,
       default: false,
     },
-    isActive: {
+
+    isTrending: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 const Product = mongoose.model("Product", productSchema);
