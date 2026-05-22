@@ -24,15 +24,15 @@ const InfluencerCard = ({ product }) => {
 
   return (
     <motion.article
-      // 🛠️ Changed flex-shrink-0 to shrink-0 for Tailwind v4 compatibility
-      className="group relative w-[220px] md:w-[260px] shrink-0 overflow-hidden rounded-3xl bg-zinc-950 cursor-pointer border border-zinc-900/40"
+      // 🛠️ Fixed Stacking: Added relative z-0 layer so it respects parent tracking rules without breaking buttons
+      className="group w-[220px] md:w-[260px] shrink-0 overflow-hidden rounded-3xl bg-zinc-950 cursor-pointer border border-zinc-900/40 z-0"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       {/* Aspect Container */}
-      <div className="relative aspect-[9/16] overflow-hidden">
+      <div className="relative aspect-[9/16] overflow-hidden bg-zinc-950">
         
         {/* Core Video Component */}
         <video
@@ -41,16 +41,17 @@ const InfluencerCard = ({ product }) => {
           loop
           playsInline
           preload="metadata"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+          // 🛠️ Added explicit z-0 to video so it stays at the lowest layer within this component
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] z-0"
         >
           <source src={product.video} type="video/mp4" />
         </video>
 
-        {/* Cinematic Gradient Overlays (Using explicit v4 colors) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/30 to-transparent transition-opacity duration-300 group-hover:opacity-90" />
+        {/* Cinematic Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/30 to-transparent transition-opacity duration-300 group-hover:opacity-90 z-10" />
 
         {/* 🪄 Play/Pause Overlay Indicator */}
-        <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-md">
+        <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-md z-20">
           <AnimatePresence mode="wait">
             {!isPlaying ? (
               <motion.div
@@ -77,7 +78,7 @@ const InfluencerCard = ({ product }) => {
         </div>
 
         {/* Interface Content Block Container */}
-        <div className="absolute bottom-0 inset-x-0 p-5 flex flex-col items-start z-10 text-left">
+        <div className="absolute bottom-0 inset-x-0 p-5 flex flex-col items-start z-20 text-left">
           
           <span className="mb-2.5 inline-block rounded-lg bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-200 backdrop-blur-md border border-white/5">
             Trending

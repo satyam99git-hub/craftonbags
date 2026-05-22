@@ -9,6 +9,7 @@ import LuggageSection from '../components/home/LuggageSection'
 import InfluencerFavorite from '../components/home/InfluencerFavorites'
 import InfluencerFavorites from '../components/home/InfluencerFavorites'
 import Footer from '../components/common/Footer'
+import InfluencerSection from '../components/influencer/InfluencerSection'
 
 const Home = () => {
   return (
@@ -19,7 +20,7 @@ const Home = () => {
       <BackpackSection />
       <SchoolSection />
       <LuggageSection />
-      <InfluencerFavorites/>
+      <InfluencerSection />
       <Footer/>
     </div>
   )
