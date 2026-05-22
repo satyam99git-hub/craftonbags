@@ -10,6 +10,7 @@ import Profile from "../pages/Profile";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Wishlist from "../pages/Wishlist";
 import AboutUs from "../pages/AboutUs";
+import Shop from "../pages/Shop";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -26,6 +27,10 @@ const AppRoutes = () => {
       <Route
         path="/register"
         element={<Home />}
+      />
+      <Route
+        path="/shop"
+        element={<Shop />}
       />
 
       <Route

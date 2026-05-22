@@ -7,7 +7,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 pt-12 pb-16">
         <nav className="text-xs text-gray-500 mb-6 flex space-x-2">
-          <a href="#" className="hover:underline">Home</a>
+          <a href="/" className="hover:underline">Home</a>
           <span>&gt;</span>
           <span className="text-gray-800">About Us</span>
         </nav>

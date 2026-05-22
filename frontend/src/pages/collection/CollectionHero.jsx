@@ -4,7 +4,6 @@ import { ArrowRight, Compass, ChevronDown } from "lucide-react";
 const CollectionHero = () => {
   return (
     <section className="relative h-[500px] sm:h-[560px] md:h-[640px] w-full overflow-hidden bg-zinc-950 group">
-      
       {/* Dynamic Injecting Keyframes for Custom Spin Rotation */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes slowSpin {

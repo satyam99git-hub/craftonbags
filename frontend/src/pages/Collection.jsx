@@ -6,7 +6,6 @@ import CollectionGrid from "./collection/CollectionGrid";
 const Collection = () => {
   return (
     <div className="min-h-screen bg-stone-50">
-      
       <CollectionHero />
 
       <CollectionGrid />
