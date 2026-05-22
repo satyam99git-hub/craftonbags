@@ -19,7 +19,6 @@ const Home = () => {
       <SchoolSection />
       <LuggageSection />
       <InfluencerSection />
-      <Footer/>
     </div>
   )
 }

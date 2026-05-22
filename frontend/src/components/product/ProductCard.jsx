@@ -1,86 +1,133 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const ProductCard = ({ image, name, oldPrice, newPrice, volume = "28L" }) => {
-  const numOld = parseInt(oldPrice.replace(/,/g, ""), 10);
-  const numNew = parseInt(newPrice.replace(/,/g, ""), 10);
-  const discountPercent = Math.round(((numOld - numNew) / numOld) * 100);
+const ProductCard = ({ product }) => {
+  const {
+    image,
+    images,
+    title,
+    name,
+    price,
+    originalPrice,
+    volume = "28L",
+    slug,
+    description,
+    category,
+  } = product;
+
+  // Dynamic Fallbacks
+  const productImage =
+    image || images?.[0];
+
+  const productTitle =
+    title || name;
+
+  // Discount Logic
+  const discountPercent =
+    originalPrice
+      ? Math.round(
+          ((originalPrice - price) /
+            originalPrice) *
+            100
+        )
+      : 0;
 
   return (
-    <div className="group relative flex flex-col bg-white rounded-xl overflow-hidden border border-zinc-100 transition-all duration-300 hover:shadow-lg">
-      
-      {/* 🎒 Top Image Workspace Frame */}
-      <div className="relative w-full aspect-square bg-zinc-50 overflow-hidden select-none">
-        
-        {/* Focused & Immersive Product Image Asset */}
-        <img
-          src={image}
-          alt={name}
-          className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-          loading="lazy"
-        />
+    <Link
+      to={`/product/${slug}`}
+      className="block h-full"
+    >
+      <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
 
-        {/* Lit Volume Badge Floating Layer */}
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-xs text-zinc-700 text-[11px] font-bold px-2 py-0.5 rounded shadow-xs border border-zinc-200/40 z-10">
-          {volume}
+        {/* Product Image */}
+        <div className="relative aspect-square overflow-hidden bg-zinc-100">
+
+          {/* Product Image */}
+          <img
+            src={productImage}
+            alt={productTitle}
+            loading="lazy"
+            className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
+
+          {/* Volume Badge */}
+          <div className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-zinc-800 backdrop-blur-md">
+            {volume}
+          </div>
+
+          {/* Hover Button */}
+          <div className="absolute inset-x-4 bottom-4 translate-y-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+
+            <button
+              type="button"
+              className="w-full rounded-2xl bg-white py-3 text-xs font-black uppercase tracking-[0.2em] text-black shadow-xl transition-all duration-300 hover:bg-zinc-100"
+            >
+              View Product
+            </button>
+
+          </div>
         </div>
 
-        {/* ⚡ Desktop Hover Action: Quick Shop Slide Overlay */}
-        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out p-3 hidden md:block bg-gradient-to-t from-black/20 via-black/5 to-transparent z-10">
-          <button
-            type="button"
-            className="w-full bg-zinc-950 hover:bg-zinc-900 text-white font-bold text-xs tracking-wider uppercase py-2.5 rounded shadow-md transition-colors duration-200 cursor-pointer"
-          >
-            Shop Now
-          </button>
-        </div>
-      </div>
+        {/* Content */}
+        <div className="flex flex-1 flex-col p-5">
 
-      {/* 📝 Metadata & Pricing Grid Area */}
-      <div className="p-4 flex flex-col flex-grow text-left bg-white z-20">
-        
-        {/* Title Track */}
-        <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight line-clamp-1 group-hover:text-blue-600 transition-colors duration-150">
-          {name}
-        </h3>
-
-        {/* Sub-label description */}
-        <p className="text-xs text-zinc-400 font-medium mt-0.5 line-clamp-1">
-          Explore Our Collection of Luggage & Backpacks
-        </p>
-
-        {/* Price Area Block */}
-        <div className="mt-3.5 flex items-baseline gap-2 flex-wrap">
-          
-          <span className="text-base font-black text-zinc-950">
-            ₹{newPrice}
+          {/* Category */}
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400">
+            {category || "CRAFTON COLLECTION"}
           </span>
-          
-          {discountPercent > 0 && (
-            <>
-              <span className="text-xs text-zinc-400 line-through font-medium">
-                ₹{oldPrice}
-              </span>
-              <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
-                {discountPercent}% off
-              </span>
-            </>
-          )}
 
-        </div>
+          {/* Title */}
+          <h3 className="mt-2 line-clamp-1 text-sm font-black uppercase tracking-tight text-zinc-950 transition-colors duration-300 group-hover:text-amber-700 md:text-base">
+            {productTitle}
+          </h3>
 
-        {/* 📱 Mobile Fallback Trigger button */}
-        <div className="mt-4 block md:hidden">
+          {/* Description */}
+          <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500 md:text-sm">
+            {description ||
+              "Premium lifestyle backpack designed for travel, work, and modern essentials."}
+          </p>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Price Area */}
+          <div className="mt-5 flex items-center gap-2 flex-wrap">
+
+            {/* Final Price */}
+            <span className="text-xl font-black tracking-tight text-zinc-950">
+              ₹{price}
+            </span>
+
+            {/* Original Price */}
+            {originalPrice && (
+              <span className="text-sm font-medium text-zinc-400 line-through">
+                ₹{originalPrice}
+              </span>
+            )}
+
+            {/* Discount */}
+            {discountPercent > 0 && (
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600">
+                {discountPercent}% OFF
+              </span>
+            )}
+
+          </div>
+
+          {/* Mobile Button */}
           <button
             type="button"
-            className="w-full bg-zinc-900 text-white text-xs font-bold py-2.5 rounded uppercase active:scale-[0.98] transition-transform"
+            className="mt-5 block rounded-2xl bg-zinc-950 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-black md:hidden"
           >
-            Add to Cart
+            View Product
           </button>
+
         </div>
-
-      </div>
-
-    </div>
+      </article>
+    </Link>
   );
 };
 

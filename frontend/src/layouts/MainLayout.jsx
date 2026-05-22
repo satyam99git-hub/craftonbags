@@ -2,6 +2,7 @@ import React from "react";
 
 import Hometop from "../components/ribbion/Hometop";
 import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 
 const MainLayout = ({
   children,
@@ -22,6 +23,7 @@ const MainLayout = ({
       <main className="overflow-x-hidden">
         {children}
       </main>
+      <Footer />
     </div>
   );
 };
