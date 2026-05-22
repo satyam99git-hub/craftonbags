@@ -8,7 +8,7 @@ import Home from "../pages/Home";
 import Collection from "../pages/Collection";
 import Profile from "../pages/Profile";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
-
+import Wishlist from "../pages/Wishlist";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -39,6 +39,11 @@ const AppRoutes = () => {
             <Profile />
           </ProtectedRoute>
         }
+      />
+
+      <Route
+        path="/wishlist"
+        element={<Wishlist />}
       />
     </Routes>
   );

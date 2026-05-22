@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Heart,
   ShoppingCart,
@@ -7,6 +6,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+
 
 const NavActions = ({
   onOpenAuth,
@@ -26,10 +26,17 @@ const NavActions = ({
     onOpenAuth();
   };
 
+  const WishlistClick = () => {
+    navigate("/wishlist");
+  }
+
   return (
     <div className="flex justify-center gap-4 sm:gap-6">
       
-      <button className="group font-medium text-xs flex flex-col items-center gap-1 text-slate-600 hover:text-rose-600 transition-all duration-300">
+      <button
+        onClick={WishlistClick}
+        className="group font-medium text-xs flex flex-col items-center gap-1 text-slate-600 hover:text-rose-600 transition-all duration-300"
+      >
         <Heart className="w-5 h-5 group-hover:scale-110 transition-all" />
         <span>Wishlist</span>
       </button>
