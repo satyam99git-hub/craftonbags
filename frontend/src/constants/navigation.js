@@ -22,6 +22,6 @@ export const NAV_LINKS = [
   {
     id: 5,
     label: "ABOUT US",
-    path: "/about",
+    path: "/aboutus",
   },
 ];

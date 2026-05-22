@@ -9,6 +9,7 @@ import Collection from "../pages/Collection";
 import Profile from "../pages/Profile";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Wishlist from "../pages/Wishlist";
+import AboutUs from "../pages/AboutUs";
 const AppRoutes = () => {
   return (
     <Routes>
@@ -30,6 +31,11 @@ const AppRoutes = () => {
       <Route
         path="/collection"
         element={<Collection />}
+      />
+
+      <Route
+        path="/aboutus"
+        element={<AboutUs />}
       />
 
       <Route
