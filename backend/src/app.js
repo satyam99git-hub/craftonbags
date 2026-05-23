@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
+import rateLimit from "express-rate-limit";
+import compression from "compression";
 import authRoutes from "./routes/auth.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
@@ -19,6 +21,19 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(helmet());
+
+// Basic rate limiting
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
+// Gzip compression
+app.use(compression());
 
 const allowedOrigins = (
   process.env.CLIENT_URL || "http://localhost:5173"

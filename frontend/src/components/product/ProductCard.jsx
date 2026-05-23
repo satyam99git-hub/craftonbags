@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
@@ -15,12 +16,12 @@ const ProductCard = ({ product }) => {
     category,
   } = product;
 
-  // Dynamic Fallbacks
+  // Safe Dynamic Fallbacks
   const productImage =
     image || images?.[0];
 
   const productTitle =
-    title || name;
+    title || name || "Product";
 
   // Discount Logic
   const discountPercent =
@@ -42,7 +43,7 @@ const ProductCard = ({ product }) => {
         {/* Product Image */}
         <div className="relative aspect-square overflow-hidden bg-zinc-100">
 
-          {/* Product Image */}
+          {/* Main Image */}
           <img
             src={productImage}
             alt={productTitle}
@@ -87,7 +88,7 @@ const ProductCard = ({ product }) => {
           {/* Description */}
           <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500 md:text-sm">
             {description ||
-              "Premium lifestyle backpack designed for travel, work, and modern essentials."}
+              "Premium lifestyle backpack designed for travel and work."}
           </p>
 
           {/* Spacer */}
@@ -108,7 +109,7 @@ const ProductCard = ({ product }) => {
               </span>
             )}
 
-            {/* Discount */}
+            {/* Discount Badge */}
             {discountPercent > 0 && (
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600">
                 {discountPercent}% OFF
@@ -117,7 +118,7 @@ const ProductCard = ({ product }) => {
 
           </div>
 
-          {/* Mobile Button */}
+          {/* Mobile CTA */}
           <button
             type="button"
             className="mt-5 block rounded-2xl bg-zinc-950 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-black md:hidden"

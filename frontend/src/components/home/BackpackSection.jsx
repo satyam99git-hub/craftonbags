@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import ProductCard from "../product/ProductCard";
 import products from "../../data/product";
 
@@ -8,31 +10,35 @@ const categories = [
 ];
 
 const BackpackSection = () => {
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] =
     useState("PROFESSIONAL");
 
+  const filteredProducts =
+    products.filter((product) =>
+      activeTab === "PROFESSIONAL"
+        ? product.category === "Backpacks"
+        : product.category !== "Backpacks"
+    );
+
   return (
     <section className="mx-auto max-w-7xl bg-white px-4 py-16 sm:px-6 md:px-8 lg:px-16">
-      
-      {/* Top Tag */}
-      <div className="mb-2 flex items-center justify-center gap-3">
-        <span className="h-1 w-1 rounded-full bg-blue-600" />
 
-        <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+      {/* Heading */}
+      <div className="text-center">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
           Trending Collections
         </p>
 
-        <span className="h-1 w-1 rounded-full bg-blue-600" />
+        <h2 className="mt-4 text-3xl font-black text-zinc-900 md:text-5xl">
+          Backpacks Collection
+        </h2>
       </div>
-
-      {/* Heading */}
-      <h2 className="mx-auto max-w-3xl text-center text-2xl font-extrabold uppercase tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
-        Backpacks — Your Everyday Essential
-      </h2>
 
       {/* Tabs */}
       <div className="mx-auto mt-10 flex max-w-lg items-center justify-center gap-6 border-b border-zinc-100 md:gap-10">
-        
+
         {categories.map((item) => (
           <button
             key={item}
@@ -58,29 +64,10 @@ const BackpackSection = () => {
         ))}
       </div>
 
-      {/* Product Grid */}
-      <div
-        key={activeTab}
-        className="mt-12 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 animate-[fadeSlide_0.4s_ease-out_both]"
-      >
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              @keyframes fadeSlide {
-                from {
-                  opacity: 0;
-                  transform: translateY(12px);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-            `,
-          }}
-        />
+      {/* Products */}
+      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
-        {products[activeTab]?.map(
+        {filteredProducts.map(
           (product) => (
             <ProductCard
               key={product.id}
@@ -88,13 +75,21 @@ const BackpackSection = () => {
             />
           )
         )}
+
       </div>
 
-      {/* View All Button */}
+      {/* View All */}
       <div className="mt-12 flex justify-center">
-        <button className="cursor-pointer rounded-xl border border-black bg-black px-8 py-3 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black">
+
+        <button
+          onClick={() =>
+            navigate("/shop")
+          }
+          className="cursor-pointer rounded-xl border border-black bg-black px-8 py-3 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black"
+        >
           View All
         </button>
+
       </div>
     </section>
   );

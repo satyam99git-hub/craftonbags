@@ -1,10 +1,6 @@
-import React, {
-  useEffect,
-} from "react";
+import React, { useEffect } from "react";
 
-import {
-  useLocation,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
 
@@ -23,7 +19,7 @@ function App() {
     closeModal,
   } = useModal();
 
-  // Open modal automatically
+  // Auth Modal Control
   useEffect(() => {
     if (
       location.pathname === "/login" ||
@@ -37,9 +33,7 @@ function App() {
 
   return (
     <>
-      <MainLayout
-        onOpenRegister={openModal}
-      >
+      <MainLayout onOpenRegister={openModal}>
         <AppRoutes />
       </MainLayout>
 

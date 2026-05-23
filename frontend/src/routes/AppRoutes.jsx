@@ -11,9 +11,10 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Wishlist from "../pages/Wishlist";
 import AboutUs from "../pages/AboutUs";
 import Shop from "../pages/Shop";
-const AppRoutes = () => {
+import ProductDetails from "../pages/ProductDetails";
+const AppRoutes = ({ location }) => {
   return (
-    <Routes>
+    <Routes location={location}>
       <Route
         path="/"
         element={<Home />}
@@ -32,6 +33,16 @@ const AppRoutes = () => {
         path="/shop"
         element={<Shop />}
       />
+
+      <Route
+        path="/products"
+        element={<Shop />}
+      />
+
+      <Route
+  path="/product/:slug"
+  element={<ProductDetails />}
+/>
 
       <Route
         path="/collection"

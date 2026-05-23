@@ -101,6 +101,9 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// Create text index for search performance on title and description
+productSchema.index({ title: "text", description: "text" });
+
 const Product = mongoose.model("Product", productSchema);
 
 export default Product;
