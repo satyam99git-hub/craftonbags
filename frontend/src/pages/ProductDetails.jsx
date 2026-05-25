@@ -26,6 +26,8 @@ import {
   useWishlist,
 } from "../context/WishlistContext";
 
+import useAuth from "../hooks/useAuth";
+
 const ProductDetails = () => {
   const { slug } = useParams();
 
@@ -35,6 +37,9 @@ const ProductDetails = () => {
     toggleWishlist,
     isWishlisted,
   } = useWishlist();
+
+  const { isAuthenticated } =
+    useAuth();
 
   const [product, setProduct] =
     useState(null);
@@ -129,6 +134,14 @@ const ProductDetails = () => {
 
   // Add To Cart
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      alert(
+        "Please login first to add products to cart."
+      );
+
+      return;
+    }
+
     const cart =
       JSON.parse(
         localStorage.getItem("cart")
@@ -169,6 +182,19 @@ const ProductDetails = () => {
     );
 
     alert("Added To Cart");
+  };
+
+  // Wishlist
+  const handleWishlist = () => {
+    if (!isAuthenticated) {
+      alert(
+        "Please login first to use wishlist."
+      );
+
+      return;
+    }
+
+    toggleWishlist(product);
   };
 
   return (
@@ -339,33 +365,40 @@ const ProductDetails = () => {
                 className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-black px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-zinc-800"
               >
                 <ShoppingBag size={18} />
+
                 Add To Cart
               </button>
 
               {/* Wishlist */}
-              <button
-                onClick={() =>
-                  toggleWishlist(product)
-                }
-                className={`flex items-center justify-center gap-2 rounded-2xl border px-8 py-4 text-sm font-bold uppercase tracking-wider transition ${
-                  isWishlisted(product.id)
-                    ? "border-rose-500 bg-rose-50 text-rose-600"
-                    : "border-zinc-300 hover:bg-zinc-100"
-                }`}
-              >
-                <Heart
-                  size={18}
-                  className={
-                    isWishlisted(product.slug)
-                      ? "fill-rose-500 text-rose-500"
-                      : ""
-                  }
-                />
+              {isAuthenticated && (
+                <button
+                  onClick={handleWishlist}
+                  className={`flex items-center justify-center gap-2 rounded-2xl border px-8 py-4 text-sm font-bold uppercase tracking-wider transition ${
+                    isWishlisted(
+                      product.slug
+                    )
+                      ? "border-rose-500 bg-rose-50 text-rose-600"
+                      : "border-zinc-300 hover:bg-zinc-100"
+                  }`}
+                >
+                  <Heart
+                    size={18}
+                    className={
+                      isWishlisted(
+                        product.slug
+                      )
+                        ? "fill-rose-500 text-rose-500"
+                        : ""
+                    }
+                  />
 
-                {isWishlisted(product.slug)
-                  ? "Wishlisted"
-                  : "Wishlist"}
-              </button>
+                  {isWishlisted(
+                    product.slug
+                  )
+                    ? "Wishlisted"
+                    : "Wishlist"}
+                </button>
+              )}
 
               {/* Share */}
               <button className="flex items-center justify-center rounded-2xl border border-zinc-300 px-5 py-4 transition hover:bg-zinc-100">

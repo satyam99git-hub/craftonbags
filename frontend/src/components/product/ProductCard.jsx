@@ -8,11 +8,16 @@ import {
   useWishlist,
 } from "../../context/WishlistContext";
 
+import useAuth from "../../hooks/useAuth";
+
 const ProductCard = ({ product }) => {
   const {
     toggleWishlist,
     isWishlisted,
   } = useWishlist();
+
+  const { isAuthenticated } =
+    useAuth();
 
   const {
     image,
@@ -55,24 +60,28 @@ const ProductCard = ({ product }) => {
         <div className="relative aspect-square overflow-hidden bg-zinc-100">
 
           {/* Wishlist */}
-          <button
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
+          {isAuthenticated && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-    toggleWishlist(product);
-  }}
-  className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
->
-            <Heart
-              size={18}
-              className={`transition-all duration-300 ${
-                isWishlisted(product.slug)
-                  ? "fill-red-500 text-red-500"
-                  : "text-zinc-700"
-              }`}
-            />
-          </button>
+                toggleWishlist(product);
+              }}
+              className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <Heart
+                size={18}
+                className={`transition-all duration-300 ${
+                  isWishlisted(
+                    product.slug
+                  )
+                    ? "fill-red-500 text-red-500"
+                    : "text-zinc-700"
+                }`}
+              />
+            </button>
+          )}
 
           {/* Main Image */}
           <img

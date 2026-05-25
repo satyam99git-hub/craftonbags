@@ -20,8 +20,18 @@ import {
   useWishlist,
 } from "../../context/WishlistContext";
 
+import useAuth from "../../hooks/useAuth";
+
 const FeaturedProducts = () => {
   const navigate = useNavigate();
+
+  const {
+    wishlist,
+    toggleWishlist,
+  } = useWishlist();
+
+  const { isAuthenticated } =
+    useAuth();
 
   const [offset, setOffset] =
     useState(0);
@@ -30,12 +40,6 @@ const FeaturedProducts = () => {
     useState(false);
 
   const trackRef = useRef(null);
-
-  // GLOBAL WISHLIST
-  const {
-    wishlist,
-    toggleWishlist,
-  } = useWishlist();
 
   // Featured Products
   const featuredProducts =
@@ -84,13 +88,13 @@ const FeaturedProducts = () => {
       );
   }, [isPaused]);
 
-  // Check if product exists in wishlist
+  // Check Wishlist
   const isInWishlist = (
-    productId
+    productSlug
   ) => {
     return wishlist.some(
       (item) =>
-        item.id === productId
+        item.slug === productSlug
     );
   };
 
@@ -154,7 +158,7 @@ const FeaturedProducts = () => {
                 index
               ) => (
                 <article
-                  key={`${product.id}-${index}`}
+                  key={`${product.slug}-${index}`}
                   onClick={() =>
                     navigate(
                       `/product/${product.slug}`
@@ -177,29 +181,33 @@ const FeaturedProducts = () => {
                     />
 
                     {/* Wishlist */}
-                    <button
-                      onClick={(
-                        e
-                      ) => {
-                        e.stopPropagation();
+                    {isAuthenticated && (
+                      <button
+                        onClick={(
+                          e
+                        ) => {
+                          e.preventDefault();
 
-                        toggleWishlist(
-                          product
-                        );
-                      }}
-                      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:scale-105"
-                    >
-                      <Heart
-                        size={18}
-                        className={
-                          isInWishlist(
-                            product.id
-                          )
-                            ? "fill-red-500 text-red-500"
-                            : "text-zinc-700"
-                        }
-                      />
-                    </button>
+                          e.stopPropagation();
+
+                          toggleWishlist(
+                            product
+                          );
+                        }}
+                        className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:scale-105"
+                      >
+                        <Heart
+                          size={18}
+                          className={
+                            isInWishlist(
+                              product.slug
+                            )
+                              ? "fill-red-500 text-red-500"
+                              : "text-zinc-700"
+                          }
+                        />
+                      </button>
+                    )}
 
                   </div>
 
