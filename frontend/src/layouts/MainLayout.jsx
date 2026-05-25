@@ -9,20 +9,22 @@ const MainLayout = ({
   onOpenRegister,
 }) => {
   return (
-    <div className="min-h-screen bg-stone-50">
-      
+    <div className="min-h-screen flex flex-col bg-stone-50">
+
       {/* Top Ribbon */}
       <Hometop />
 
-      {/* Sticky Navbar */}
+      {/* Navbar */}
       <Navbar
         onOpenRegister={onOpenRegister}
       />
 
       {/* Main Content */}
-      <main className="overflow-x-hidden">
+      <main className="flex-grow overflow-x-hidden">
         {children}
       </main>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

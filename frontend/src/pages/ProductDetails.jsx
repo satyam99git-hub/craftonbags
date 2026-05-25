@@ -1,315 +1,442 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  Heart,
+  ShoppingBag,
+  Star,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  Plus,
+  Minus,
+  Share2,
+} from "lucide-react";
+
 import { fetchProductByIdOrSlug } from "../features/products/productAPI";
+
+import {
+  useWishlist,
+} from "../context/WishlistContext";
 
 const ProductDetails = () => {
   const { slug } = useParams();
+
   const navigate = useNavigate();
-  
-  // Core API States
-  const [product, setProduct] = useState(null);
-  const [activeImage, setActiveImage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Custom High-End UX States
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("specifications");
-  const [isAdded, setIsAdded] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("Tan Brown");
-  const [showStickyBar, setShowStickyBar] = useState(false);
-  const [showChat, setShowChat] = useState(false);
 
-  // Zoom Physics Tracking Hooks
-  const [zoomStyle, setZoomStyle] = useState({ display: "none" });
-  const zoomContainerRef = useRef(null);
+  const {
+    toggleWishlist,
+    isWishlisted,
+  } = useWishlist();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowStickyBar(window.scrollY > 550);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [product, setProduct] =
+    useState(null);
 
+  const [activeImage, setActiveImage] =
+    useState("");
+
+  const [quantity, setQuantity] =
+    useState(1);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // Load Product
   useEffect(() => {
     const loadProduct = async () => {
-      setIsLoading(true);
       try {
-        const data = await fetchProductByIdOrSlug(slug);
-        setProduct(data);
+        setLoading(true);
+
+        const data =
+          await fetchProductByIdOrSlug(
+            slug
+          );
+
         if (data) {
-          setActiveImage(data.image || (data.images && data.images[0]));
+          setProduct(data);
+
+          setActiveImage(
+            data.image ||
+              data.images?.[0]
+          );
         }
       } catch (error) {
-        console.error("Critical component crash during data hydrate", error);
+        console.error(error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
+
     loadProduct();
   }, [slug]);
 
-  // Premium Magnifying Tracking Calculation
-  const handleMouseMove = (e) => {
-    if (!zoomContainerRef.current) return;
-    const { left, top, width, height } = zoomContainerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomStyle({
-      display: "block",
-      backgroundImage: `url(${activeImage})`,
-      backgroundPosition: `${x}% ${y}%`,
-      backgroundSize: "220%"
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setZoomStyle({ display: "none" });
-  };
-
-  if (isLoading) {
+  // Loading
+  if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin" />
-        <div className="text-[10px] font-bold tracking-widest text-stone-400 uppercase animate-pulse">Initializing Luxury Canvas</div>
+      <div className="flex min-h-[70vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-zinc-200 border-t-black" />
+
+          <p className="mt-5 text-sm font-medium text-zinc-500">
+            Loading Product...
+          </p>
+        </div>
       </div>
     );
   }
 
+  // Product Not Found
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
-        <button onClick={() => navigate(-1)} className="text-xs font-black tracking-widest uppercase border-b-2 border-black pb-1">Return to Grid</button>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-5">
+        <h2 className="text-3xl font-black text-zinc-900">
+          Product Not Found
+        </h2>
+
+        <button
+          onClick={() => navigate("/")}
+          className="rounded-2xl bg-black px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-zinc-800"
+        >
+          Go Home
+        </button>
       </div>
     );
   }
 
-  const allImages = [product.image, ...(product.images || [])].filter(Boolean);
-  const discount = product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
+  // Images
+  const allImages = [
+    product.image,
+    ...(product.images || []),
+  ].filter(Boolean);
+
+  // Discount
+  const discount =
+    product.originalPrice
+      ? Math.round(
+          ((product.originalPrice -
+            product.price) /
+            product.originalPrice) *
+            100
+        )
+      : 0;
+
+  // Add To Cart
+  const handleAddToCart = () => {
+    const cart =
+      JSON.parse(
+        localStorage.getItem("cart")
+      ) || [];
+
+    const existingProduct =
+      cart.find(
+        (item) =>
+          item.slug === product.slug
+      );
+
+    let updatedCart;
+
+    if (existingProduct) {
+      updatedCart = cart.map((item) =>
+        item.slug === product.slug
+          ? {
+              ...item,
+              quantity:
+                item.quantity +
+                quantity,
+            }
+          : item
+      );
+    } else {
+      updatedCart = [
+        ...cart,
+        {
+          ...product,
+          quantity,
+        },
+      ];
+    }
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+    alert("Added To Cart");
+  };
 
   return (
-    <section className="min-h-screen bg-[#F9F8F6] text-stone-900 font-sans antialiased selection:bg-stone-900 selection:text-white relative pb-24">
-      
-      {/* FEATURE 1: ULTRA-SMOOTH STICKY DESKTOP HEADER ACTION DOCK */}
-      <div className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-stone-100 px-8 py-3 flex items-center justify-between transition-all duration-500 ease-out ${
-        showStickyBar ? "translate-y-0 opacity-100 shadow-[0_4px_30px_rgba(0,0,0,0.02)]" : "-translate-y-full opacity-0 pointer-events-none"
-      }`}>
-        <div className="flex items-center gap-4">
-          <img src={product.image} alt="" className="w-12 h-12 object-contain bg-stone-50 p-1 rounded-xl mix-blend-multiply" />
+    <section className="bg-white py-10 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+
+        {/* Back */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-8 text-sm font-semibold text-zinc-500 transition hover:text-black"
+        >
+          ← Back
+        </button>
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+
+          {/* LEFT SIDE */}
           <div>
-            <h4 className="text-xs font-bold truncate max-w-[240px]">{product.title}</h4>
-            <p className="text-xs font-medium text-stone-500">₹{product.price?.toLocaleString("en-IN")}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded">Only 5 left!</span>
-          <button 
-            onClick={() => setIsAdded(true)}
-            className="bg-stone-900 hover:bg-stone-800 text-white text-[11px] font-bold uppercase tracking-wider px-6 py-2.5 rounded-xl transition-transform active:scale-95"
-          >
-            {isAdded ? "Added to Bag ✓" : "Instant Secure Add"}
-          </button>
-        </div>
-      </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
-        
-        {/* CORE NAV BAR */}
-        <div className="flex items-center justify-between mb-8">
-          <button onClick={() => navigate(-1)} className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">
-            <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            Back
-          </button>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-400">
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"/> Fast Delivery</span>
-          </div>
-        </div>
-
-        {/* COMPONENT LAYOUT MATRIX */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
-          {/* MEDIA PLATFORM ENGINE (LEFT) */}
-          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-5">
-            
-            {/* Gallery Track Selector */}
-            {allImages.length > 1 && (
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto max-h-[500px] scrollbar-none">
-                {allImages.map((img, i) => (
-                  <button
-                    key={i}
-                    onMouseEnter={() => setActiveImage(img)}
-                    className={`relative aspect-square w-16 xl:w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-white p-2 transition-all border ${
-                      activeImage === img ? "border-stone-900 scale-95 shadow-sm" : "border-stone-200/60 opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    <img src={img} alt="" className="h-full w-full object-contain mix-blend-multiply" />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* FEATURE 2: NORMALIZED ZOOM MATRIX CANVAS CONTAINER */}
-            <div 
-              ref={zoomContainerRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              className="flex-1 relative aspect-square max-w-[500px] mx-auto w-full overflow-hidden rounded-[2rem] bg-white border border-stone-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] flex items-center justify-center p-8 cursor-zoom-in group"
-            >
-              <span className="absolute top-4 right-4 text-[9px] font-bold tracking-widest text-stone-400 border border-stone-200 px-2 py-1 rounded-full uppercase bg-white">Hover to inspect</span>
+            {/* Main Image */}
+            <div className="overflow-hidden rounded-3xl bg-zinc-100">
               <img
                 src={activeImage}
-                alt=""
-                className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:opacity-0"
-              />
-              {/* Virtual Physics Zoom Overlay Window */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-[2rem]" 
-                style={zoomStyle} 
+                alt={product.title}
+                className="h-[500px] w-full object-cover"
               />
             </div>
+
+            {/* Thumbnails */}
+            {allImages.length > 1 && (
+              <div className="mt-5 flex gap-4 overflow-x-auto pb-2">
+
+                {allImages.map(
+                  (img, index) => (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        setActiveImage(img)
+                      }
+                      className={`overflow-hidden rounded-2xl border-2 transition-all ${
+                        activeImage === img
+                          ? "border-black"
+                          : "border-zinc-200"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt="thumb"
+                        className="h-24 w-24 object-cover"
+                      />
+                    </button>
+                  )
+                )}
+              </div>
+            )}
           </div>
 
-          {/* COMPILATION AND INTERACTIVES (RIGHT) */}
-          <div className="lg:col-span-5 space-y-8">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold tracking-[0.2em] text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md uppercase">Live Inventory: Only 5 Left!</span>
-                
-                {/* FEATURE 3: SATISFYING WISHLIST HEART TOGGLE */}
-                <button 
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="group flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-stone-400 hover:text-rose-600 transition-colors"
-                >
-                  <span>Wishlist</span>
-                  <svg className={`w-5 h-5 transition-transform active:scale-125 duration-300 ${isWishlisted ? "fill-rose-500 stroke-rose-500 scale-110" : "stroke-current fill-none group-hover:scale-105"}`} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
+          {/* RIGHT SIDE */}
+          <div className="flex flex-col">
+
+            {/* Category */}
+            <span className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">
+              {product.category}
+            </span>
+
+            {/* Title */}
+            <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 md:text-5xl">
+              {product.title}
+            </h1>
+
+            {/* Rating */}
+            <div className="mt-5 flex items-center gap-3">
+
+              <div className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1">
+
+                <Star
+                  size={15}
+                  className="fill-amber-400 text-amber-400"
+                />
+
+                <span className="text-sm font-bold">
+                  {product.rating || 4.8}
+                </span>
               </div>
 
-              <h1 className="text-3xl font-black tracking-tight text-stone-900 leading-tight">{product.title}</h1>
-              <p className="text-xs leading-relaxed text-stone-500">{product.description}</p>
+              <span className="text-sm text-zinc-500">
+                120+ Reviews
+              </span>
+
             </div>
 
-            {/* Pricing Section */}
-            <div className="flex items-baseline gap-3 border-b border-stone-200/60 pb-5">
-              <span className="text-3xl font-black">₹{product.price?.toLocaleString("en-IN")}</span>
+            {/* Price */}
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+
+              <span className="text-4xl font-black text-zinc-950">
+                ₹
+                {product.price?.toLocaleString(
+                  "en-IN"
+                )}
+              </span>
+
               {product.originalPrice && (
-                <>
-                  <span className="text-sm text-stone-400 line-through">₹{product.originalPrice?.toLocaleString("en-IN")}</span>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">{discount}% Saved</span>
-                </>
+                <span className="text-2xl text-zinc-400 line-through">
+                  ₹
+                  {product.originalPrice?.toLocaleString(
+                    "en-IN"
+                  )}
+                </span>
+              )}
+
+              {discount > 0 && (
+                <span className="rounded-full bg-emerald-100 px-4 py-1 text-sm font-bold text-emerald-700">
+                  {discount}% OFF
+                </span>
               )}
             </div>
 
-            {/* FEATURE 4: DYNAMIC MULTI-COLOR SWATCH MATRIX */}
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs font-bold tracking-wider uppercase text-stone-400">
-                <span>Selected Colorway</span>
-                <span className="text-stone-900">{selectedColor}</span>
-              </div>
-              <div className="flex gap-3">
-                {[
-                  { name: "Tan Brown", hex: "#B47B59" },
-                  { name: "Stealth Slate", hex: "#4A4E51" },
-                  { name: "Carbon Midnight", hex: "#1A1C1E" }
-                ].map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => setSelectedColor(color.name)}
-                    style={{ backgroundColor: color.hex }}
-                    className={`w-8 h-8 rounded-full ring-offset-4 transition-all duration-300 transform hover:scale-110 ${
-                      selectedColor === color.name ? "ring-2 ring-stone-900 scale-105" : "ring-1 ring-black/10"
-                    }`}
-                    title={color.name}
-                  />
-                ))}
+            {/* Description */}
+            <p className="mt-7 text-base leading-relaxed text-zinc-600">
+              {product.description}
+            </p>
+
+            {/* Quantity */}
+            <div className="mt-8">
+              <p className="mb-3 text-sm font-bold uppercase tracking-wider text-zinc-700">
+                Quantity
+              </p>
+
+              <div className="flex w-fit items-center overflow-hidden rounded-2xl border border-zinc-300">
+
+                <button
+                  onClick={() =>
+                    setQuantity((prev) =>
+                      prev > 1
+                        ? prev - 1
+                        : 1
+                    )
+                  }
+                  className="flex h-12 w-12 items-center justify-center transition hover:bg-zinc-100"
+                >
+                  <Minus size={18} />
+                </button>
+
+                <span className="flex h-12 w-14 items-center justify-center text-lg font-bold">
+                  {quantity}
+                </span>
+
+                <button
+                  onClick={() =>
+                    setQuantity(
+                      (prev) => prev + 1
+                    )
+                  }
+                  className="flex h-12 w-12 items-center justify-center transition hover:bg-zinc-100"
+                >
+                  <Plus size={18} />
+                </button>
               </div>
             </div>
 
-            {/* Quantity Stepper Engine */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Allocation Volume</label>
-              <div className="flex items-center w-32 border border-stone-200 bg-white rounded-xl shadow-sm overflow-hidden p-0.5">
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-9 h-9 flex items-center justify-center font-bold text-stone-400 hover:text-stone-900 transition-colors">-</button>
-                <span className="flex-1 text-center font-bold text-xs text-stone-800">{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)} className="w-9 h-9 flex items-center justify-center font-bold text-stone-400 hover:text-stone-900 transition-colors">+</button>
-              </div>
+            {/* Buttons */}
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+
+              {/* Cart */}
+              <button
+                onClick={handleAddToCart}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-black px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-zinc-800"
+              >
+                <ShoppingBag size={18} />
+                Add To Cart
+              </button>
+
+              {/* Wishlist */}
+              <button
+                onClick={() =>
+                  toggleWishlist(product)
+                }
+                className={`flex items-center justify-center gap-2 rounded-2xl border px-8 py-4 text-sm font-bold uppercase tracking-wider transition ${
+                  isWishlisted(product.id)
+                    ? "border-rose-500 bg-rose-50 text-rose-600"
+                    : "border-zinc-300 hover:bg-zinc-100"
+                }`}
+              >
+                <Heart
+                  size={18}
+                  className={
+                    isWishlisted(product.slug)
+                      ? "fill-rose-500 text-rose-500"
+                      : ""
+                  }
+                />
+
+                {isWishlisted(product.slug)
+                  ? "Wishlisted"
+                  : "Wishlist"}
+              </button>
+
+              {/* Share */}
+              <button className="flex items-center justify-center rounded-2xl border border-zinc-300 px-5 py-4 transition hover:bg-zinc-100">
+                <Share2 size={18} />
+              </button>
+
             </div>
 
-            {/* Premium Call to Action */}
-            <button
-              onClick={() => { setIsAdded(true); setTimeout(() => setIsAdded(false), 2000); }}
-              className={`w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-md transform active:scale-98 ${
-                isAdded ? "bg-emerald-600 text-white shadow-emerald-600/10" : "bg-stone-900 text-white hover:bg-stone-800 shadow-stone-900/10"
-              }`}
-            >
-              {isAdded ? "Allocated To Bag ✓" : "Secure Selection & Add To Bag"}
-            </button>
+            {/* Features */}
+            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-            {/* FEATURE 5: LIVE COMPARISON OVERLAY MATRIX */}
-            <div className="bg-stone-50 border border-stone-200/60 p-4 rounded-2xl space-y-3">
-              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-stone-500">
-                <span>Product Comparison Matrix</span>
-                <span className="text-[10px] text-stone-400 lowercase">Live updates</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-100 shadow-sm">
-                <img src={product.image} alt="" className="w-10 h-10 object-contain mix-blend-multiply bg-stone-50 rounded" />
-                <div className="flex-1 text-[11px] leading-snug">
-                  <p className="font-bold text-stone-800">Current Model (-30% Spec variant)</p>
-                  <p className="text-stone-400">Includes advanced structural scaffolding & custom zipper lines</p>
+              <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 p-4">
+                <Truck size={20} />
+
+                <div>
+                  <p className="text-sm font-bold">
+                    Free Delivery
+                  </p>
+
+                  <p className="text-xs text-zinc-500">
+                    On all orders
+                  </p>
                 </div>
               </div>
-            </div>
 
-            {/* Luxury Modular Content Tabs */}
-            <div className="border-t border-stone-200 pt-6">
-              <div className="flex gap-6 border-b border-stone-100 pb-2">
-                {["specifications", "customer stories", "sustainability"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`text-xs font-bold uppercase tracking-widest pb-2 relative transition-colors ${
-                      activeTab === tab ? "text-stone-900" : "text-stone-400 hover:text-stone-600"
-                    }`}
-                  >
-                    {tab}
-                    {activeTab === tab && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-stone-900 rounded-full" />}
-                  </button>
-                ))}
-              </div>
-              <div className="mt-4 text-xs leading-relaxed text-stone-500 min-h-[50px]">
-                {activeTab === "specifications" && <p>{product.description || "Assembled with high-density ballistic nylon and custom weather-sealed hardware components."}</p>}
-                {activeTab === "customer stories" && <p>★ ★ ★ ★ ★ — "The weight distribution is phenomenal. Better than any premium traveler option I've used this year." - Kabir S.</p>}
-                {activeTab === "sustainability" && <p>Crafted cleanly with 100% recycled lining textiles and zero carbon footprint offset shipping processes.</p>}
-              </div>
-            </div>
+              <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 p-4">
+                <RotateCcw size={20} />
 
+                <div>
+                  <p className="text-sm font-bold">
+                    Easy Returns
+                  </p>
+
+                  <p className="text-xs text-zinc-500">
+                    7 days return policy
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 p-4">
+                <ShieldCheck size={20} />
+
+                <div>
+                  <p className="text-sm font-bold">
+                    Secure Payment
+                  </p>
+
+                  <p className="text-xs text-zinc-500">
+                    100% protected
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 p-4">
+                <Star size={20} />
+
+                <div>
+                  <p className="text-sm font-bold">
+                    Premium Quality
+                  </p>
+
+                  <p className="text-xs text-zinc-500">
+                    Crafted carefully
+                  </p>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
-
-      {/* FEATURE 6: LIVE CHAT SUPPORT PORTAL FLOATER */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
-        {showChat && (
-          <div className="w-72 bg-white rounded-2xl border border-stone-200/80 shadow-2xl p-4 animate-fade-in-up">
-            <div className="flex items-center gap-2 border-b border-stone-100 pb-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-xs font-bold text-stone-800">Skyline Concierge Support</p>
-            </div>
-            <p className="text-xs text-stone-500">Hello! Looking for specific configurations on this build? Ask me anything.</p>
-          </div>
-        )}
-        <button 
-          onClick={() => setShowChat(!showChat)}
-          className="bg-white hover:bg-stone-50 text-stone-900 border border-stone-200 rounded-full p-3.5 shadow-xl transition-transform hover:rotate-12 active:scale-95 flex items-center justify-center relative"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white animate-bounce" />
-        </button>
-      </div>
-
     </section>
   );
 };

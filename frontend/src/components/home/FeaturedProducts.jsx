@@ -6,20 +6,22 @@ import React, {
 
 import {
   Heart,
-  ShoppingBag,
   Star,
   ArrowRight,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import productsData from "../../data/product";
 
+import {
+  useWishlist,
+} from "../../context/WishlistContext";
+
 const FeaturedProducts = () => {
   const navigate = useNavigate();
-
-  const [wishlist, setWishlist] =
-    useState({});
 
   const [offset, setOffset] =
     useState(0);
@@ -29,29 +31,26 @@ const FeaturedProducts = () => {
 
   const trackRef = useRef(null);
 
+  // GLOBAL WISHLIST
+  const {
+    wishlist,
+    toggleWishlist,
+  } = useWishlist();
+
+  // Featured Products
   const featuredProducts =
     productsData.filter(
       (product) => product.featured
     );
 
+  // Infinite Loop
   const loopProducts = [
     ...featuredProducts,
     ...featuredProducts,
     ...featuredProducts,
   ];
 
-  const toggleWishlist = (
-    id,
-    e
-  ) => {
-    e.stopPropagation();
-
-    setWishlist((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
+  // Auto Slider
   useEffect(() => {
     let animationFrameId;
 
@@ -59,8 +58,8 @@ const FeaturedProducts = () => {
       if (!isPaused && trackRef.current) {
         setOffset((prev) => {
           const maxScroll =
-            trackRef.current.scrollWidth /
-            3;
+            trackRef.current
+              .scrollWidth / 3;
 
           const next = prev + 0.7;
 
@@ -71,7 +70,9 @@ const FeaturedProducts = () => {
       }
 
       animationFrameId =
-        requestAnimationFrame(animate);
+        requestAnimationFrame(
+          animate
+        );
     };
 
     animationFrameId =
@@ -82,6 +83,16 @@ const FeaturedProducts = () => {
         animationFrameId
       );
   }, [isPaused]);
+
+  // Check if product exists in wishlist
+  const isInWishlist = (
+    productId
+  ) => {
+    return wishlist.some(
+      (item) =>
+        item.id === productId
+    );
+  };
 
   return (
     <section className="relative overflow-hidden bg-stone-50 py-20">
@@ -127,6 +138,8 @@ const FeaturedProducts = () => {
             setIsPaused(false)
           }
         >
+
+          {/* Track */}
           <div
             ref={trackRef}
             className="flex w-max gap-6"
@@ -134,8 +147,12 @@ const FeaturedProducts = () => {
               transform: `translateX(-${offset}px)`,
             }}
           >
+
             {loopProducts.map(
-              (product, index) => (
+              (
+                product,
+                index
+              ) => (
                 <article
                   key={`${product.id}-${index}`}
                   onClick={() =>
@@ -145,65 +162,88 @@ const FeaturedProducts = () => {
                   }
                   className="group relative flex w-[320px] cursor-pointer flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
                 >
+
+                  {/* Image */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
 
                     <img
-                      src={product.image}
-                      alt={product.title}
+                      src={
+                        product.image
+                      }
+                      alt={
+                        product.title
+                      }
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
+                    {/* Wishlist */}
                     <button
-                      onClick={(e) =>
+                      onClick={(
+                        e
+                      ) => {
+                        e.stopPropagation();
+
                         toggleWishlist(
-                          product.id,
-                          e
-                        )
-                      }
-                      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white"
+                          product
+                        );
+                      }}
+                      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-all duration-300 hover:scale-105"
                     >
                       <Heart
                         size={18}
                         className={
-                          wishlist[
+                          isInWishlist(
                             product.id
-                          ]
+                          )
                             ? "fill-red-500 text-red-500"
-                            : ""
+                            : "text-zinc-700"
                         }
                       />
                     </button>
 
                   </div>
 
+                  {/* Content */}
                   <div className="p-5">
 
                     <span className="text-xs uppercase text-zinc-400">
-                      {product.category}
+                      {
+                        product.category
+                      }
                     </span>
 
                     <h3 className="mt-2 text-lg font-black">
-                      {product.title}
+                      {
+                        product.title
+                      }
                     </h3>
 
                     <p className="mt-2 text-sm text-zinc-500">
-                      {product.description}
+                      {
+                        product.description
+                      }
                     </p>
 
+                    {/* Bottom */}
                     <div className="mt-5 flex items-center justify-between">
 
                       <div>
 
                         <span className="text-xl font-black">
-                          ₹{product.price}
-                        </span>
-
-                        <span className="ml-2 text-sm line-through text-zinc-400">
                           ₹
                           {
-                            product.originalPrice
+                            product.price
                           }
                         </span>
+
+                        {product.originalPrice && (
+                          <span className="ml-2 text-sm line-through text-zinc-400">
+                            ₹
+                            {
+                              product.originalPrice
+                            }
+                          </span>
+                        )}
 
                       </div>
 
@@ -215,7 +255,9 @@ const FeaturedProducts = () => {
                         />
 
                         <span className="text-sm font-bold">
-                          {product.rating}
+                          {
+                            product.rating
+                          }
                         </span>
 
                       </div>
@@ -226,6 +268,7 @@ const FeaturedProducts = () => {
                 </article>
               )
             )}
+
           </div>
         </div>
       </div>

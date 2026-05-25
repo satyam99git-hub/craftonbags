@@ -2,7 +2,18 @@ import React from "react";
 
 import { Link } from "react-router-dom";
 
+import { Heart } from "lucide-react";
+
+import {
+  useWishlist,
+} from "../../context/WishlistContext";
+
 const ProductCard = ({ product }) => {
+  const {
+    toggleWishlist,
+    isWishlisted,
+  } = useWishlist();
+
   const {
     image,
     images,
@@ -43,6 +54,26 @@ const ProductCard = ({ product }) => {
         {/* Product Image */}
         <div className="relative aspect-square overflow-hidden bg-zinc-100">
 
+          {/* Wishlist */}
+          <button
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    toggleWishlist(product);
+  }}
+  className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
+>
+            <Heart
+              size={18}
+              className={`transition-all duration-300 ${
+                isWishlisted(product.slug)
+                  ? "fill-red-500 text-red-500"
+                  : "text-zinc-700"
+              }`}
+            />
+          </button>
+
           {/* Main Image */}
           <img
             src={productImage}
@@ -62,12 +93,9 @@ const ProductCard = ({ product }) => {
           {/* Hover Button */}
           <div className="absolute inset-x-4 bottom-4 translate-y-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
 
-            <button
-              type="button"
-              className="w-full rounded-2xl bg-white py-3 text-xs font-black uppercase tracking-[0.2em] text-black shadow-xl transition-all duration-300 hover:bg-zinc-100"
-            >
+            <div className="w-full rounded-2xl bg-white py-3 text-center text-xs font-black uppercase tracking-[0.2em] text-black shadow-xl transition-all duration-300 hover:bg-zinc-100">
               View Product
-            </button>
+            </div>
 
           </div>
         </div>
@@ -77,7 +105,8 @@ const ProductCard = ({ product }) => {
 
           {/* Category */}
           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400">
-            {category || "CRAFTON COLLECTION"}
+            {category ||
+              "CRAFTON COLLECTION"}
           </span>
 
           {/* Title */}
@@ -95,22 +124,29 @@ const ProductCard = ({ product }) => {
           <div className="flex-1" />
 
           {/* Price Area */}
-          <div className="mt-5 flex items-center gap-2 flex-wrap">
+          <div className="mt-5 flex flex-wrap items-center gap-2">
 
             {/* Final Price */}
             <span className="text-xl font-black tracking-tight text-zinc-950">
-              ₹{price}
+              ₹
+              {price?.toLocaleString(
+                "en-IN"
+              )}
             </span>
 
             {/* Original Price */}
             {originalPrice && (
               <span className="text-sm font-medium text-zinc-400 line-through">
-                ₹{originalPrice}
+                ₹
+                {originalPrice?.toLocaleString(
+                  "en-IN"
+                )}
               </span>
             )}
 
             {/* Discount Badge */}
-            {discountPercent > 0 && (
+            {discountPercent >
+              0 && (
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600">
                 {discountPercent}% OFF
               </span>
@@ -119,12 +155,9 @@ const ProductCard = ({ product }) => {
           </div>
 
           {/* Mobile CTA */}
-          <button
-            type="button"
-            className="mt-5 block rounded-2xl bg-zinc-950 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-black md:hidden"
-          >
+          <div className="mt-5 hidden rounded-2xl bg-zinc-950 py-3 text-center text-xs font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-black max-md:block">
             View Product
-          </button>
+          </div>
 
         </div>
       </article>
