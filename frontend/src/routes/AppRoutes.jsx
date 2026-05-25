@@ -12,6 +12,8 @@ import Wishlist from "../pages/Wishlist";
 import AboutUs from "../pages/AboutUs";
 import Shop from "../pages/Shop";
 import ProductDetails from "../pages/ProductDetails";
+import Categories from "../components/home/Categories";
+import CategoryShop from "../pages/CategoryShop";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
@@ -83,6 +85,9 @@ const AppRoutes = ({ location }) => {
         element={<AdminRoutes />}
       />
 
+      {/* Target Route path mapping configuration rules */}
+      <Route path="/" element={<Categories />} />
+      <Route path="/shop/:categorySlug" element={<CategoryShop />} />
     </Routes>
   );
 };
