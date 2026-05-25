@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Routes,
   Route,
@@ -7,14 +8,21 @@ import {
 import Home from "../pages/Home";
 import Collection from "../pages/Collection";
 import Profile from "../pages/Profile";
-import ProtectedRoute from "../components/auth/ProtectedRoute";
 import Wishlist from "../pages/Wishlist";
 import AboutUs from "../pages/AboutUs";
 import Shop from "../pages/Shop";
 import ProductDetails from "../pages/ProductDetails";
+
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+
+/* ADMIN */
+import AdminRoutes from "../admin/routes/AdminRoutes";
+
 const AppRoutes = ({ location }) => {
   return (
     <Routes location={location}>
+
+      {/* USER ROUTES */}
       <Route
         path="/"
         element={<Home />}
@@ -29,6 +37,7 @@ const AppRoutes = ({ location }) => {
         path="/register"
         element={<Home />}
       />
+
       <Route
         path="/shop"
         element={<Shop />}
@@ -40,9 +49,9 @@ const AppRoutes = ({ location }) => {
       />
 
       <Route
-  path="/product/:slug"
-  element={<ProductDetails />}
-/>
+        path="/product/:slug"
+        element={<ProductDetails />}
+      />
 
       <Route
         path="/collection"
@@ -67,6 +76,13 @@ const AppRoutes = ({ location }) => {
         path="/wishlist"
         element={<Wishlist />}
       />
+
+      {/* ADMIN ROUTES */}
+      <Route
+        path="/admin/*"
+        element={<AdminRoutes />}
+      />
+
     </Routes>
   );
 };
