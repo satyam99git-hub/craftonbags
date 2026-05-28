@@ -21,11 +21,21 @@ Planned fields:
 - `name`: string
 - `email`: string, unique
 - `password`: string, hashed
+- `photoURL`: string
+- `provider`: `credentials` or `google`
+- `firebaseUid`: string, unique sparse
+- `welcomeEmailSentAt`: date
 - `role`: `user` or `admin`
 - `phone`: string
 - `addresses`: array
 - `createdAt`: date
 - `updatedAt`: date
+
+Notes:
+
+- `password` is required only for `credentials` users.
+- Google users are created or updated after Firebase ID token verification.
+- `welcomeEmailSentAt` records successful welcome email delivery for first-time Google signups.
 
 ### products
 
@@ -121,6 +131,7 @@ Planned fields:
 ## Index Suggestions
 
 - `users.email`
+- `users.firebaseUid`
 - `products.slug`
 - `products.category`
 - `products.name`

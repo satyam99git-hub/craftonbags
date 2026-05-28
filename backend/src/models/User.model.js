@@ -16,8 +16,29 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required() {
+        return this.provider === "credentials";
+      },
       select: false,
+    },
+    photoURL: {
+      type: String,
+      default: "",
+    },
+    provider: {
+      type: String,
+      enum: ["credentials", "google"],
+      default: "credentials",
+    },
+    firebaseUid: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
+    welcomeEmailSentAt: {
+      type: Date,
+      default: null,
     },
     role: {
       type: String,

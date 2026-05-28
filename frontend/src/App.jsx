@@ -9,6 +9,7 @@ import AppRoutes from "./routes/AppRoutes";
 import AuthModal from "./components/auth/AuthModal";
 
 import useModal from "./hooks/useModal";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const location = useLocation();
@@ -40,6 +41,15 @@ function App() {
       <AuthModal
         isOpen={isOpen}
         onClose={closeModal}
+      />
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          className:
+            "text-sm font-medium",
+        }}
       />
     </>
   );

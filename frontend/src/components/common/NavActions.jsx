@@ -23,6 +23,7 @@ const NavActions = ({
 
   const {
     isAuthenticated,
+    user,
   } = useAuth();
 
   const { wishlist } =
@@ -116,7 +117,21 @@ const NavActions = ({
         className="group flex flex-col items-center gap-1 text-xs font-medium text-slate-600 transition-all duration-300 hover:text-emerald-600"
       >
 
-        <CircleUserRound className="h-5 w-5 transition-all duration-300 group-hover:scale-110" />
+        {isAuthenticated ? (
+          user?.photoURL ? (
+            <img
+              src={user.photoURL}
+              alt=""
+              className="h-6 w-6 rounded-full object-cover ring-1 ring-zinc-200 transition-all duration-300 group-hover:scale-110"
+            />
+          ) : (
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-950 text-[11px] font-black uppercase text-white transition-all duration-300 group-hover:scale-110">
+              {(user?.name || user?.email || "U").charAt(0)}
+            </span>
+          )
+        ) : (
+          <CircleUserRound className="h-5 w-5 transition-all duration-300 group-hover:scale-110" />
+        )}
 
         <span>
           {isAuthenticated

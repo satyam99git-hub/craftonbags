@@ -40,6 +40,18 @@ NODE_ENV=development
 CLIENT_URL=http://localhost:5173
 MONGO_URI=mongodb://127.0.0.1:27017/craftonbags
 JWT_SECRET=change-this-secret
+JWT_EXPIRE=7d
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-google-app-password
+MAIL_FROM_NAME=Crafton Bags
+MAIL_FROM_EMAIL=your-email@gmail.com
+MAIL_REPLY_TO=support@craftonbags.com
 ```
 
 Add these when integrations are implemented:
@@ -54,6 +66,21 @@ SMTP_HOST=
 SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
+```
+
+For Google authentication, generate a Firebase Admin SDK service account key from Firebase Project settings. You may also store the whole JSON as `FIREBASE_SERVICE_ACCOUNT_KEY`.
+
+For Gmail SMTP, enable 2-Step Verification on the Gmail account and create an App Password. Use that App Password as `SMTP_PASS`, not your normal Gmail password.
+
+For Resend SMTP, verify your sending domain in Resend and use:
+
+```env
+SMTP_HOST=smtp.resend.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=resend
+SMTP_PASS=re_xxxxxxxxx
+MAIL_FROM_EMAIL=hello@your-verified-domain.com
 ```
 
 ## Step 4: Start MongoDB
@@ -118,6 +145,7 @@ src/middlewares/  Auth, admin, upload, and error middleware
 src/models/       Mongoose schemas
 src/routes/       Express route definitions
 src/services/     Reusable business logic
+src/templates/    Transactional email templates
 src/validators/   Request validation rules
 src/utils/        Shared backend helpers
 src/uploads/      Local upload folders for development
@@ -133,6 +161,10 @@ src/uploads/      Local upload folders for development
 6. Do not commit real `.env` secrets.
 7. Update `docs/api-docs.md` when routes change.
 8. Update `docs/db-schema.md` when models change.
+
+## Welcome Email Flow
+
+Google sign-in sends a welcome email only when the MongoDB user is created for the first time. Repeat Google logins do not send duplicate welcome emails. Delivery is non-blocking, so users are not prevented from signing in if SMTP is temporarily unavailable.
 
 ## Troubleshooting
 

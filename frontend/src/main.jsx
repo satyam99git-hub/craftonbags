@@ -14,6 +14,9 @@ import "./styles/globals.css";
 import {
   WishlistProvider,
 } from "./context/WishlistContext";
+import {
+  AuthProvider,
+} from "./context/AuthContext";
 
 ReactDOM.createRoot(
   document.getElementById("root")
@@ -21,9 +24,11 @@ ReactDOM.createRoot(
   <React.StrictMode>
     <BrowserRouter>
 
-      <WishlistProvider>
-        <App />
-      </WishlistProvider>
+      <AuthProvider>
+        <WishlistProvider>
+          <App />
+        </WishlistProvider>
+      </AuthProvider>
 
     </BrowserRouter>
   </React.StrictMode>

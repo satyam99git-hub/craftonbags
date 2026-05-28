@@ -30,11 +30,67 @@ Response:
 ```text
 POST /api/auth/register
 POST /api/auth/login
+POST /api/auth/google
 POST /api/auth/logout
+POST /api/auth/refresh
 GET  /api/auth/me
+GET  /api/auth/protected-example
 ```
 
 Used for account creation, login, logout, and current user lookup.
+
+#### POST /api/auth/google
+
+Auth requirement: public route with Firebase ID token verification.
+
+Request body:
+
+```json
+{
+  "idToken": "firebase-id-token"
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Google login successful",
+  "data": {
+    "user": {
+      "_id": "mongo-user-id",
+      "name": "Crafton User",
+      "email": "user@example.com",
+      "photoURL": "https://...",
+      "provider": "google",
+      "role": "user"
+    }
+  }
+}
+```
+
+Side effect: sets a secure httpOnly `token` cookie containing the application JWT.
+
+Email behavior: when the Google account creates a new MongoDB user for the first time, the backend sends a premium welcome email. Existing users can log in repeatedly without duplicate welcome emails.
+
+Error cases:
+
+- `400` when `idToken` is missing.
+- `401` when Firebase token verification fails or the Google email is not verified.
+- `500` when Firebase Admin credentials are not configured.
+
+#### POST /api/auth/refresh
+
+Auth requirement: authenticated cookie or bearer token.
+
+Refreshes the application JWT cookie and returns the current user.
+
+#### GET /api/auth/protected-example
+
+Auth requirement: authenticated cookie or bearer token.
+
+Use this route to verify protected API access during development.
 
 ### Products
 

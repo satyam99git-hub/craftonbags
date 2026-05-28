@@ -6,4 +6,27 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const isAuthRequest =
+      originalRequest?.url?.startsWith("/auth/");
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthRequest
+    ) {
+      originalRequest._retry = true;
+
+      await axiosInstance.post("/auth/refresh");
+      return axiosInstance(originalRequest);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { loginUser } from "../features/auth/authAPI";
 import { saveAuth } from "../features/auth/authStorage";
@@ -57,13 +58,16 @@ const useLogin = ({
         await loginUser(formData);
 
       saveAuth(response.data);
+      toast.success("Login successful");
       onSuccess?.(response.data);
 
     } catch (err) {
-      setError(
+      const message =
         err?.response?.data?.message ||
-          "Login failed"
-      );
+          "Login failed";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

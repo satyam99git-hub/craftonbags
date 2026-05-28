@@ -1,7 +1,19 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { register, login, logout, getCurrentUser } from "../controllers/auth.controller.js";
-import { validateRegister, validateLogin } from "../validators/auth.validator.js";
+import {
+  register,
+  login,
+  googleAuth,
+  logout,
+  refreshSession,
+  getCurrentUser,
+  protectedExample,
+} from "../controllers/auth.controller.js";
+import {
+  validateRegister,
+  validateLogin,
+  validateGoogleAuth,
+} from "../validators/auth.validator.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -16,7 +28,10 @@ const authLimiter = rateLimit({
 
 router.post("/register", authLimiter, validateRegister, register);
 router.post("/login", authLimiter, validateLogin, login);
+router.post("/google", authLimiter, validateGoogleAuth, googleAuth);
 router.post("/logout", logout);
+router.post("/refresh", authMiddleware, refreshSession);
 router.get("/me", authMiddleware, getCurrentUser);
+router.get("/protected-example", authMiddleware, protectedExample);
 
 export default router;

@@ -36,9 +36,17 @@ Add:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 ```
 
 Important: frontend environment variables must start with `VITE_`.
+
+Enable Google sign-in in Firebase Authentication and add `localhost` plus your deployed frontend domain under authorized domains.
 
 ## Step 4: Start The Frontend
 
@@ -85,6 +93,8 @@ src/api/          Axios setup and endpoint constants
 src/app/          Redux store setup
 src/assets/       Images, icons, and animations
 src/components/   Reusable UI components
+src/config/       Firebase and frontend service configuration
+src/context/      React providers such as auth and wishlist
 src/features/     Redux slices and feature API files
 src/hooks/        Reusable React hooks
 src/layouts/      Shared page layouts

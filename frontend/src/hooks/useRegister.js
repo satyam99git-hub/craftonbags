@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { registerUser } from "../features/auth/authAPI";
 import { saveAuth } from "../features/auth/authStorage";
@@ -72,13 +73,16 @@ const useRegister = ({
         await registerUser(formData);
 
       saveAuth(response.data);
+      toast.success("Account created");
       onSuccess?.(response.data);
 
     } catch (err) {
-      setError(
+      const message =
         err?.response?.data?.message ||
-          "Registration failed"
-      );
+          "Registration failed";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

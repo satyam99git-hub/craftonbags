@@ -7,6 +7,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { X } from "lucide-react";
 
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
@@ -135,9 +136,10 @@ const AuthModal = ({
           <button
             type="button"
             onClick={handleClose}
+            aria-label="Close authentication modal"
             className="absolute right-6 top-6 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-black"
           >
-            ✕
+            <X className="h-5 w-5" />
           </button>
 
           {/* Form Wrapper */}

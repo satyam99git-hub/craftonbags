@@ -1,12 +1,14 @@
 import asyncHandler from "../utils/asyncHandler.js";
-import { registerService, loginService } from "../services/auth.service.js";
-
-const getAuthCookieOptions = () => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+import {
+  googleAuthService,
+  registerService,
+  loginService,
+} from "../services/auth.service.js";
+import {
+  getAuthCookieOptions,
+  getClearAuthCookieOptions,
+} from "../utils/authCookie.js";
+import generateToken from "../utils/generateToken.js";
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -40,16 +42,42 @@ export const login = asyncHandler(async (req, res) => {
   });
 });
 
-export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+export const googleAuth = asyncHandler(async (req, res) => {
+  const { idToken } = req.body;
+
+  const data = await googleAuthService({ idToken });
+
+  res.cookie("token", data.token, getAuthCookieOptions());
+
+  res.status(200).json({
+    success: true,
+    message: "Google login successful",
+    data: {
+      user: data.user,
+    },
   });
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie("token", getClearAuthCookieOptions());
 
   res.status(200).json({
     success: true,
     message: "Logout successful",
+  });
+});
+
+export const refreshSession = asyncHandler(async (req, res) => {
+  const token = generateToken(req.user._id, req.user.role);
+
+  res.cookie("token", token, getAuthCookieOptions());
+
+  res.status(200).json({
+    success: true,
+    message: "Session refreshed",
+    data: {
+      user: req.user,
+    },
   });
 });
 
@@ -64,11 +92,24 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        photoURL: user.photoURL,
+        provider: user.provider,
         phone: user.phone,
         addresses: user.addresses,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
+    },
+  });
+});
+
+export const protectedExample = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "You can access this protected route",
+    data: {
+      userId: req.user._id,
+      role: req.user.role,
     },
   });
 });

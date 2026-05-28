@@ -26,10 +26,29 @@ export const loginUser = async (
   return response.data;
 };
 
+export const loginWithGoogle = async (
+  idToken
+) => {
+  const response =
+    await axiosInstance.post(
+      "/auth/google",
+      { idToken }
+    );
+
+  return response.data;
+};
+
 export const getCurrentUser = async () => {
   const response = await axiosInstance.get(
     "/auth/me"
   );
+
+  return response.data;
+};
+
+export const refreshSession = async () => {
+  const response =
+    await axiosInstance.post("/auth/refresh");
 
   return response.data;
 };

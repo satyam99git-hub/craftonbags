@@ -4,8 +4,10 @@ import { Mail } from "lucide-react";
 
 import InputField from "../common/InputField";
 import PasswordField from "../common/PasswordField";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 import useLogin from "../../hooks/useLogin";
+import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 const LoginForm = ({
   onSwitchToRegister,
@@ -18,6 +20,13 @@ const LoginForm = ({
     handleChange,
     handleSubmit,
   } = useLogin({
+    onSuccess,
+  });
+
+  const {
+    googleLoading,
+    continueWithGoogle,
+  } = useGoogleAuth({
     onSuccess,
   });
 
@@ -78,14 +87,27 @@ const LoginForm = ({
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-black hover:bg-zinc-800 text-white py-3 rounded-xl font-semibold transition-all"
+          disabled={loading || googleLoading}
+          className="w-full bg-black hover:bg-zinc-800 text-white py-3 rounded-xl font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading
             ? "Signing In..."
             : "Sign In"}
         </button>
       </form>
+
+      <div className="my-5 flex items-center gap-4">
+        <div className="h-px flex-1 bg-zinc-200" />
+        <span className="text-xs font-medium text-zinc-400">
+          OR
+        </span>
+        <div className="h-px flex-1 bg-zinc-200" />
+      </div>
+
+      <GoogleAuthButton
+        loading={googleLoading}
+        onClick={continueWithGoogle}
+      />
 
       <div className="mt-6 text-center text-sm text-zinc-600">
         Don't have an account?{" "}

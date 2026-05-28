@@ -45,6 +45,14 @@ npm install
 
 Run this again whenever `package.json` or `package-lock.json` changes.
 
+Google authentication uses these packages:
+
+```bash
+npm install firebase --workspace frontend
+npm install firebase-admin --workspace backend
+npm install react-hot-toast --workspace frontend
+```
+
 ## Step 4: Create Backend Environment File
 
 Create or update:
@@ -61,9 +69,25 @@ NODE_ENV=development
 CLIENT_URL=http://localhost:5173
 MONGO_URI=mongodb://127.0.0.1:27017/craftonbags
 JWT_SECRET=change-this-secret
+JWT_EXPIRE=7d
+
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-google-app-password
+MAIL_FROM_NAME=Crafton Bags
+MAIL_FROM_EMAIL=your-email@gmail.com
+MAIL_REPLY_TO=support@craftonbags.com
 ```
 
 For MongoDB Atlas, replace `MONGO_URI` with the Atlas connection string.
+
+You can also set `FIREBASE_SERVICE_ACCOUNT_KEY` to the full Firebase Admin SDK service account JSON string instead of the three split Firebase Admin values.
 
 ## Step 5: Create Frontend Environment File
 
@@ -77,9 +101,41 @@ Add:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
+VITE_FIREBASE_API_KEY=your-web-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-web-app-id
 ```
 
 Frontend environment variables must start with `VITE_`.
+
+## Firebase Google Auth Setup
+
+1. Create a Firebase project.
+2. Open Authentication, enable the Google sign-in provider, and add your support email.
+3. In Project settings, create a Web app and copy its Firebase config into `frontend/.env`.
+4. Add authorized domains for local and deployed frontends, for example `localhost` and your production domain.
+5. In Project settings > Service accounts, generate a Firebase Admin SDK private key and add it to `backend/.env`.
+6. Restart both backend and frontend after changing environment variables.
+
+## Welcome Email Setup
+
+Google sign-in sends a premium welcome email only when a Google user is created for the first time.
+
+For Gmail SMTP:
+
+1. Enable 2-Step Verification on the Gmail account.
+2. Create an App Password from Google Account security settings.
+3. Put that App Password in `SMTP_PASS`.
+
+For Resend SMTP:
+
+1. Verify your sending domain in Resend.
+2. Use `SMTP_HOST=smtp.resend.com`.
+3. Use `SMTP_USER=resend`.
+4. Use your Resend API key as `SMTP_PASS`.
 
 ## Step 6: Start MongoDB
 

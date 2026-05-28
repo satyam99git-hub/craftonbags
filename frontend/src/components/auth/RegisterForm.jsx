@@ -3,8 +3,10 @@ import { Mail, User } from "lucide-react";
 
 import InputField from "../common/InputField";
 import PasswordField from "../common/PasswordField";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 import useRegister from "../../hooks/useRegister";
+import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 const RegisterForm = ({
   onSwitchToLogin,
@@ -17,6 +19,13 @@ const RegisterForm = ({
     handleChange,
     handleSubmit,
   } = useRegister({
+    onSuccess,
+  });
+
+  const {
+    googleLoading,
+    continueWithGoogle,
+  } = useGoogleAuth({
     onSuccess,
   });
 
@@ -118,8 +127,8 @@ const RegisterForm = ({
         {/* Submit */}
         <button
           type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-black py-3 text-sm font-semibold text-white transition-all hover:bg-zinc-800 disabled:opacity-70"
+          disabled={loading || googleLoading}
+          className="w-full rounded-xl bg-black py-3 text-sm font-semibold text-white transition-all hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading
             ? "Creating Account..."
@@ -139,18 +148,10 @@ const RegisterForm = ({
       </div>
 
       {/* Google Button */}
-      <button
-        type="button"
-        className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-300 py-3 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-50"
-      >
-        <img
-          src="https://www.svgrepo.com/show/475656/google-color.svg"
-          alt="Google"
-          className="h-5 w-5"
-        />
-
-        Continue with Google
-      </button>
+      <GoogleAuthButton
+        loading={googleLoading}
+        onClick={continueWithGoogle}
+      />
 
       {/* Footer */}
       <div className="mt-5 text-center text-sm text-zinc-600">

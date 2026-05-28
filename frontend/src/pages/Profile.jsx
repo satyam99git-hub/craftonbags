@@ -70,6 +70,14 @@ const Profile = () => {
       icon: ShieldCheck,
     },
     {
+      label: "Provider",
+      value:
+        user.provider === "google"
+          ? "Google"
+          : "Email and password",
+      icon: ShieldCheck,
+    },
+    {
       label: "Saved Addresses",
       value: `${user.addresses?.length || 0} saved`,
       icon: MapPin,
@@ -104,9 +112,17 @@ const Profile = () => {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
           <aside className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-950 text-xl font-black uppercase text-white">
-              {(user.name || user.email || "U").charAt(0)}
-            </div>
+            {user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt=""
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-zinc-100"
+              />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-950 text-xl font-black uppercase text-white">
+                {(user.name || user.email || "U").charAt(0)}
+              </div>
+            )}
             <h2 className="mt-5 text-xl font-black text-zinc-950">
               {user.name || "Crafton Customer"}
             </h2>
