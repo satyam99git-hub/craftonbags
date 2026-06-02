@@ -30,18 +30,24 @@ const ProductCard = ({ product }) => {
     slug,
     description,
     category,
+    rating,
+    ratingsAverage,
   } = product;
 
-  // Safe Dynamic Fallbacks
   const productImage =
-    image || images?.[0];
+    image ||
+    images?.[0]?.url ||
+    "/placeholder-product.jpg";
 
   const productTitle =
     title || name || "Product";
 
-  // Discount Logic
+  const productRating =
+    rating || ratingsAverage || 0;
+
   const discountPercent =
-    originalPrice
+    originalPrice &&
+    originalPrice > price
       ? Math.round(
           ((originalPrice - price) /
             originalPrice) *
@@ -107,6 +113,7 @@ const ProductCard = ({ product }) => {
             </div>
 
           </div>
+
         </div>
 
         {/* Content */}
@@ -129,13 +136,25 @@ const ProductCard = ({ product }) => {
               "Premium lifestyle backpack designed for travel and work."}
           </p>
 
+          {/* Rating */}
+          <div className="mt-3 flex items-center gap-1">
+
+            <span className="text-amber-500">
+              ★
+            </span>
+
+            <span className="text-sm font-semibold text-zinc-700">
+              {productRating}
+            </span>
+
+          </div>
+
           {/* Spacer */}
           <div className="flex-1" />
 
           {/* Price Area */}
           <div className="mt-5 flex flex-wrap items-center gap-2">
 
-            {/* Final Price */}
             <span className="text-xl font-black tracking-tight text-zinc-950">
               ₹
               {price?.toLocaleString(
@@ -143,7 +162,6 @@ const ProductCard = ({ product }) => {
               )}
             </span>
 
-            {/* Original Price */}
             {originalPrice && (
               <span className="text-sm font-medium text-zinc-400 line-through">
                 ₹
@@ -153,7 +171,6 @@ const ProductCard = ({ product }) => {
               </span>
             )}
 
-            {/* Discount Badge */}
             {discountPercent >
               0 && (
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600">
@@ -163,7 +180,6 @@ const ProductCard = ({ product }) => {
 
           </div>
 
-          {/* Mobile CTA */}
           <div className="mt-5 hidden rounded-2xl bg-zinc-950 py-3 text-center text-xs font-black uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-black max-md:block">
             View Product
           </div>

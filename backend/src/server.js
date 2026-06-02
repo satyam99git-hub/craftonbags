@@ -1,6 +1,7 @@
 import "./config/env.js";
 import app from "./app.js";
 import connectDB from "./config/db.js";
+import seedProducts from "./seed/product.seed.js";
 
 const REQUIRED_ENV = ["MONGO_URI", "JWT_SECRET", "JWT_EXPIRE"];
 REQUIRED_ENV.forEach((key) => {
@@ -11,6 +12,8 @@ REQUIRED_ENV.forEach((key) => {
 });
 
 connectDB();
+seedProducts();
+
 
 const PORT = process.env.PORT || 5000;
 

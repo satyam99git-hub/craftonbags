@@ -1,19 +1,15 @@
-import axiosInstance from "../../api/axios";
+import axiosInstance from "./axios";
 
-// Get all products
 export const getProducts = async (params = {}) => {
   const response = await axiosInstance.get("/products", {
     params,
   });
 
-  return response.data.data.products;
+  return response.data.data;
 };
 
-// Get single product by slug or id
 export const getProductBySlug = async (slug) => {
-  const response = await axiosInstance.get(
-    `/products/${slug}`
-  );
+  const response = await axiosInstance.get(`/products/${slug}`);
 
   return response.data.data.product;
 };

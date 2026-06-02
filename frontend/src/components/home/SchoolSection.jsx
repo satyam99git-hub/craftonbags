@@ -1,8 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import schoolProducts from "../../data/schoolProducts";
+import { getProducts } from "../../api/productApi";
 
 const categories = [
   "GIRL POWER",
@@ -10,33 +14,90 @@ const categories = [
   "GAMES",
 ];
 
+const categoryMap = {
+  "GIRL POWER": "girl-power",
+  ANIME: "anime",
+  GAMES: "games",
+};
+
 const SchoolSection = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] =
     useState("GIRL POWER");
 
-  const scrollContainerRef = useRef(null);
+  const [products, setProducts] =
+    useState([]);
 
-  // Scroll Controls
-  const handleScroll = (direction) => {
+  const [loading, setLoading] =
+    useState(true);
+
+  const scrollContainerRef =
+    useRef(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data =
+          await getProducts();
+
+        setProducts(
+          data.products || []
+        );
+      } catch (error) {
+        console.error(
+          "Failed to fetch products:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const filteredProducts =
+    products.filter(
+      (product) =>
+        product.category ===
+        categoryMap[activeTab]
+    );
+    
+
+  const handleScroll = (
+    direction
+  ) => {
     if (scrollContainerRef.current) {
       const scrollAmount =
         direction === "left"
           ? -400
           : 400;
 
-      scrollContainerRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: "smooth",
-      });
+      scrollContainerRef.current.scrollBy(
+        {
+          left: scrollAmount,
+          behavior: "smooth",
+        }
+      );
     }
   };
 
-  // Open Product
-  const handleOpenProduct = (slug) => {
+  const handleOpenProduct = (
+    slug
+  ) => {
     navigate(`/product/${slug}`);
   };
+
+  if (loading) {
+    return (
+      <section className="py-20 text-center">
+        <p className="text-zinc-500">
+          Loading products...
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="relative mx-auto max-w-7xl overflow-hidden bg-[#f5f5f5] px-4 py-20 select-none sm:py-24 md:px-12">
@@ -44,7 +105,6 @@ const SchoolSection = () => {
       {/* Header */}
       <div className="flex flex-col justify-between gap-6 border-b border-zinc-300 pb-8 md:flex-row md:items-end">
 
-        {/* Left */}
         <div>
           <h2 className="text-4xl font-black uppercase leading-none tracking-tighter text-zinc-950 sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
             CAMPUS EDIT
@@ -55,10 +115,9 @@ const SchoolSection = () => {
           </p>
         </div>
 
-        {/* Right */}
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
 
-          {/* Category Tabs */}
+          {/* Tabs */}
           <div className="flex rounded-xl bg-zinc-200 p-1">
 
             {categories.map((item) => (
@@ -79,7 +138,7 @@ const SchoolSection = () => {
 
           </div>
 
-          {/* Navigation Arrows */}
+          {/* Arrows */}
           <div className="hidden items-center gap-1.5 sm:flex">
 
             <button
@@ -99,7 +158,6 @@ const SchoolSection = () => {
             >
               →
             </button>
-
           </div>
         </div>
       </div>
@@ -132,99 +190,119 @@ const SchoolSection = () => {
           }}
         />
 
-        {schoolProducts[activeTab]?.map(
-          (product) => {
-            const discountPercent =
-              Math.round(
-                ((product.originalPrice -
-                  product.price) /
-                  product.originalPrice) *
-                  100
-              );
+        {filteredProducts.length >
+        0 ? (
+          filteredProducts.map(
+            (product) => {
+              const discountPercent =
+                product.originalPrice
+                  ? Math.round(
+                      ((product.originalPrice -
+                        product.price) /
+                        product.originalPrice) *
+                        100
+                    )
+                  : 0;
 
-            return (
-              <div
-                key={product.id}
-                onClick={() =>
-                  handleOpenProduct(
-                    product.slug
-                  )
-                }
-                className="group relative w-[240px] flex-shrink-0 cursor-pointer snap-start rounded-2xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-zinc-950 hover:shadow-xl sm:w-[280px] md:w-[320px]"
-              >
+              return (
+                <div
+                  key={product._id}
+                  onClick={() =>
+                    handleOpenProduct(
+                      product.slug
+                    )
+                  }
+                  className="group relative w-[240px] flex-shrink-0 cursor-pointer snap-start rounded-2xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-zinc-950 hover:shadow-xl sm:w-[280px] md:w-[320px]"
+                >
 
-                {/* Image */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-zinc-100">
+                  {/* Image */}
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-zinc-100">
 
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="h-full w-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
+                    <img
+                      src={
+  product.image ||
+  product.images?.[0]?.url ||
+  product.images?.[0]
+}
+                      alt={
+                        product.title
+                      }
+                      className="h-full w-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {discountPercent >
+                      0 && (
+                      <div className="absolute right-3 top-3 rounded bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-black text-white">
+                        -
+                        {
+                          discountPercent
+                        }
+                        %
+                      </div>
+                    )}
 
-                  {/* Count Label */}
-                  <div className="absolute bottom-3 left-3 rounded bg-zinc-950/80 px-2 py-1 font-mono text-[9px] font-bold tracking-widest text-white backdrop-blur-sm">
-                    {product.count}
                   </div>
 
-                  {/* Discount Badge */}
-                  {discountPercent > 0 && (
-                    <div className="absolute right-3 top-3 rounded bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-black text-white">
-                      -{discountPercent}%
+                  {/* Content */}
+                  <div className="mt-4 flex flex-col text-left">
+
+                    <div className="flex items-baseline justify-between gap-2">
+
+                      <h3 className="line-clamp-1 text-base font-black uppercase tracking-tight text-zinc-950">
+                        {
+                          product.title
+                        }
+                      </h3>
+
+                      <span className="text-base font-black text-zinc-950">
+                        ₹
+                        {product.price?.toLocaleString(
+                          "en-IN"
+                        )}
+                      </span>
+
                     </div>
-                  )}
 
-                </div>
+                    <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500">
+                      {
+                        product.description
+                      }
+                    </p>
 
-                {/* Content */}
-                <div className="mt-4 flex flex-col text-left">
+                    <div className="mt-3 flex items-center justify-between border-t border-dashed border-zinc-200 pt-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
 
-                  {/* Title + Price */}
-                  <div className="flex items-baseline justify-between gap-2">
+                      <span>
+                        Equip Series
+                      </span>
 
-                    <h3 className="line-clamp-1 text-base font-black uppercase tracking-tight text-zinc-950">
-                      {product.title}
-                    </h3>
+                      {product.originalPrice && (
+                        <span className="font-medium line-through">
+                          ₹
+                          {product.originalPrice?.toLocaleString(
+                            "en-IN"
+                          )}
+                        </span>
+                      )}
 
-                    <span className="text-base font-black text-zinc-950">
-                      ₹
-                      {product.price.toLocaleString()}
-                    </span>
+                    </div>
 
-                  </div>
-
-                  {/* Description */}
-                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500">
-                    {product.description}
-                  </p>
-
-                  {/* Footer */}
-                  <div className="mt-3 flex items-center justify-between border-t border-dashed border-zinc-200 pt-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-
-                    <span>
-                      Equip Series
-                    </span>
-
-                    <span className="font-medium line-through">
-                      ₹
-                      {product.originalPrice.toLocaleString()}
-                    </span>
+                    <button
+                      type="button"
+                      className="mt-4 w-full cursor-pointer rounded-xl bg-zinc-950 py-3 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-zinc-900"
+                    >
+                      View Product
+                    </button>
 
                   </div>
 
-                  {/* Button */}
-                  <button
-                    type="button"
-                    className="mt-4 w-full cursor-pointer rounded-xl bg-zinc-950 py-3 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-zinc-900"
-                  >
-                    View Product
-                  </button>
-
                 </div>
-              </div>
-            );
-          }
+              );
+            }
+          )
+        ) : (
+          <div className="flex h-60 w-full items-center justify-center text-zinc-500">
+            No products found in this category.
+          </div>
         )}
 
         {/* End Card */}
@@ -253,6 +331,7 @@ const SchoolSection = () => {
           </button>
 
         </div>
+
       </div>
     </section>
   );

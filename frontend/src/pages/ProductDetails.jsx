@@ -20,7 +20,7 @@ import {
   Share2,
 } from "lucide-react";
 
-import { fetchProductByIdOrSlug } from "../features/products/productAPI";
+import { getProductBySlug } from "../features/products/productAPI";
 
 import {
   useWishlist,
@@ -60,17 +60,16 @@ const ProductDetails = () => {
         setLoading(true);
 
         const data =
-          await fetchProductByIdOrSlug(
+          await fetchProductBySlug(
             slug
           );
 
         if (data) {
           setProduct(data);
 
-          setActiveImage(
-            data.image ||
-              data.images?.[0]
-          );
+         setActiveImage(
+  data.images?.[0]?.url || ""
+);
         }
       } catch (error) {
         console.error(error);
@@ -116,10 +115,10 @@ const ProductDetails = () => {
   }
 
   // Images
-  const allImages = [
-    product.image,
-    ...(product.images || []),
-  ].filter(Boolean);
+ const allImages =
+  product.images?.map(
+    (img) => img.url
+  ) || [];
 
   // Discount
   const discount =

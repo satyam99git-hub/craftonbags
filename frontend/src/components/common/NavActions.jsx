@@ -25,6 +25,8 @@ const NavActions = ({
     isAuthenticated,
     user,
   } = useAuth();
+    console.log("USER:", user);
+    console.log("PHOTO URL:", user?.photoURL);
 
   const { wishlist } =
     useWishlist();

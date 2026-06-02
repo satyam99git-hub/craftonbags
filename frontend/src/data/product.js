@@ -1,9 +1,10 @@
 const products = [
   {
     id: 1,
+    sku: "BP-001",
     slug: "premium-commuter-backpack",
     title: "Premium Commuter Backpack",
-    category: "Backpacks",
+    category: "luxury-backpacks",
 
     price: 3779,
     originalPrice: 4500,
@@ -21,9 +22,7 @@ const products = [
 
     images: [
       "https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&w=1000&q=80",
-
       "https://images.unsplash.com/photo-1581605405669-fcdf81165afa?q=80&w=1200",
-
       "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200",
     ],
 
@@ -35,9 +34,10 @@ const products = [
 
   {
     id: 2,
+    sku: "BP-002",
     slug: "weekender-aviator-duffel",
     title: "Weekender Aviator Duffel",
-    category: "Travel Bags",
+    category: "luxury-backpacks",
 
     price: 2999,
     originalPrice: 3499,
@@ -55,7 +55,6 @@ const products = [
 
     images: [
       "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-
       "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1200",
     ],
 
@@ -67,9 +66,10 @@ const products = [
 
   {
     id: 3,
+    sku: "LT-001",
     slug: "classic-shoulder-tote",
     title: "Classic Shoulder Tote",
-    category: "Totes",
+    category: "leather-totes",
 
     price: 4599,
     originalPrice: 5200,
@@ -77,7 +77,7 @@ const products = [
     rating: 5.0,
     reviews: 67,
 
-    featured: true,
+    featured: false,
     tag: "Limited",
 
     volume: "28L",
@@ -97,9 +97,10 @@ const products = [
 
   {
     id: 4,
+    sku: "TD-001",
     slug: "minimalist-city-crossbody",
     title: "Minimalist City Crossbody",
-    category: "Travel Bags",
+    category: "travel-duffles",
 
     price: 2599,
     originalPrice: 3100,

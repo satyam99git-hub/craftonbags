@@ -2,9 +2,10 @@ const schoolProducts = {
   "GIRL POWER": [
     {
       id: 101,
+      sku: "GP-001",
       slug: "celeste-blue",
       title: "CELESTE BLUE",
-      category: "GIRL POWER",
+      category: "girl-power",
       description:
         "Premium pastel backpack designed for modern campus lifestyle.",
       originalPrice: 3625,
@@ -20,9 +21,10 @@ const schoolProducts = {
 
     {
       id: 102,
+      sku: "GP-002",
       slug: "bliss-orange",
       title: "BLISS ORANGE",
-      category: "GIRL POWER",
+      category: "girl-power",
       description:
         "Lightweight college backpack with modern aesthetic design.",
       originalPrice: 2400,
@@ -38,9 +40,10 @@ const schoolProducts = {
 
     {
       id: 103,
+      sku: "GP-003",
       slug: "bliss-dark-green",
       title: "BLISS DARK GREEN",
-      category: "GIRL POWER",
+      category: "girl-power",
       description:
         "Stylish backpack built for travel, books, and accessories.",
       originalPrice: 2400,
@@ -56,9 +59,10 @@ const schoolProducts = {
 
     {
       id: 104,
+      sku: "GP-004",
       slug: "bliss-orange-green",
       title: "BLISS ORANGE GREEN",
-      category: "GIRL POWER",
+      category: "girl-power",
       description:
         "Durable hybrid backpack for modern students and creators.",
       originalPrice: 2400,
@@ -76,9 +80,10 @@ const schoolProducts = {
   ANIME: [
     {
       id: 201,
+      sku: "AN-001",
       slug: "naruto-pack",
       title: "NARUTO PACK",
-      category: "ANIME",
+      category: "anime",
       description:
         "Anime-inspired backpack crafted for fans and streetwear lovers.",
       originalPrice: 3000,
@@ -96,9 +101,10 @@ const schoolProducts = {
   GAMES: [
     {
       id: 301,
+      sku: "GM-001",
       slug: "gamer-pro",
       title: "GAMER PRO",
-      category: "GAMES",
+      category: "games",
       description:
         "Gaming-inspired tech backpack with large storage capacity.",
       originalPrice: 4000,

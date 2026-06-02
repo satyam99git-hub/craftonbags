@@ -2,9 +2,10 @@ const luggageProducts = {
   "HARD LUGGAGE": [
     {
       id: 201,
+      sku: "HL-001",
       slug: "aero-spinner",
       title: "AERO SPINNER",
-      category: "HARD LUGGAGE",
+      category: "hard-luggage",
       description:
         "Premium hard-shell luggage built for modern travelers.",
       price: 6499,
@@ -14,13 +15,15 @@ const luggageProducts = {
         "https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?q=80&w=1200&auto=format&fit=crop",
       rating: 4.8,
       stock: "In Stock",
+      featured:true,
     },
 
     {
       id: 202,
+      sku: "HL-002",
       slug: "sky-elite",
       title: "SKY ELITE",
-      category: "HARD LUGGAGE",
+      category: "hard-luggage",
       description:
         "Durable and lightweight luggage with premium finish.",
       price: 7299,
@@ -30,13 +33,15 @@ const luggageProducts = {
         "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
       rating: 4.7,
       stock: "In Stock",
+      featured:false,
     },
 
     {
       id: 203,
+      sku: "HL-003",
       slug: "titan-move",
       title: "TITAN MOVE",
-      category: "HARD LUGGAGE",
+      category: "hard-luggage",
       description:
         "High-capacity travel luggage with sleek mobility.",
       price: 8199,
@@ -50,9 +55,10 @@ const luggageProducts = {
 
     {
       id: 204,
+      sku: "HL-004",
       slug: "voyager-pro",
       title: "VOYAGER PRO",
-      category: "HARD LUGGAGE",
+      category: "hard-luggage",
       description:
         "Luxury luggage crafted for frequent travelers.",
       price: 9499,
@@ -68,9 +74,10 @@ const luggageProducts = {
   "SOFT LUGGAGE": [
     {
       id: 205,
+      sku: "SL-001",
       slug: "urban-flex",
       title: "URBAN FLEX",
-      category: "SOFT LUGGAGE",
+      category: "soft-luggage",
       description:
         "Flexible soft luggage designed for city travel.",
       price: 5299,
@@ -86,9 +93,10 @@ const luggageProducts = {
   "TRAVEL SETS": [
     {
       id: 206,
+      sku: "TS-001",
       slug: "travel-master",
       title: "TRAVEL MASTER",
-      category: "TRAVEL SETS",
+      category: "travel-sets",
       description:
         "Complete travel set for premium journeys.",
       price: 12499,

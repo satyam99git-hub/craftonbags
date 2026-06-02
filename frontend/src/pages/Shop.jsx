@@ -1,351 +1,386 @@
-// Renders the product listing and shopping page with advanced filtering, sorting, and trending fallback.
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { 
+  Search, 
+  SlidersHorizontal, 
+  RefreshCw, 
+  AlertCircle,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 import ProductCard from "../components/product/ProductCard";
-import productsData from "../data/product";
+import { getProducts } from "../api/productApi";
 
 const Shop = () => {
-  // 1. Core State Management
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [maxPrice, setMaxPrice] = useState(300);
-  const [sortBy, setSortBy] = useState("FEATURED"); 
+  const [sortBy, setSortBy] = useState("FEATURED");
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [viewMode, setViewMode] = useState("GRID"); 
+  const [maxPrice, setMaxPrice] = useState(100000);
 
-  // 2. Normalize raw products data with fallbacks
-  const allProducts = useMemo(() => {
-    const rawProducts = Object.values(productsData).flat();
-    return rawProducts.map((product) => ({
-      ...product,
-      title: product.title || product.name || "Untitled Product",
-      image: product.image || product.images?.[0] || "/placeholder.jpg",
-      newPrice: Number(product.price || 0),
-      oldPrice: product.originalPrice ? Number(product.originalPrice) : null,
-      volume: product.volume || "28L",
-      inStock: product.inStock !== undefined ? product.inStock : true, 
-      rating: product.rating || 4.5, // Mock fallback rating if not present
-    }));
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data.products || []);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, []);
 
-  // 3. Extract unique categories dynamically
-  const categories = useMemo(() => {
-    const dynamicCats = new Set(allProducts.map((item) => item.category));
-    return ["ALL", ...dynamicCats];
-  }, [allProducts]);
-
-  // 4. Track highest overall price to boundary limit the slider
   const absoluteMaxPrice = useMemo(() => {
-    if (allProducts.length === 0) return 300;
-    return Math.max(...allProducts.map((p) => p.newPrice), 300);
-  }, [allProducts]);
+    if (!products.length) return 100000;
+    return Math.max(...products.map((p) => p.price || 0));
+  }, [products]);
 
-  // Auto-set initial max price window safely
-  useMemo(() => {
+  useEffect(() => {
     setMaxPrice(absoluteMaxPrice);
   }, [absoluteMaxPrice]);
 
-  // 5. Combined Filter, Match, and Sort Pipeline
+  const categories = useMemo(() => {
+    const unique = new Set(products.map((p) => p.category).filter(Boolean));
+    return ["ALL", ...Array.from(unique)];
+  }, [products]);
+
+  // Reset pagination to page 1 whenever search filters alter the criteria
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery, maxPrice, sortBy, inStockOnly, itemsPerPage]);
+
   const processedProducts = useMemo(() => {
-    let result = allProducts.filter((product) => {
+    let result = products.filter((product) => {
       const matchesCategory = activeCategory === "ALL" || product.category === activeCategory;
-      const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = product.newPrice <= maxPrice;
-      const matchesStock = !inStockOnly || product.inStock;
+      const matchesSearch = product.title?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesPrice = product.price <= maxPrice;
+      const matchesStock = !inStockOnly || product.stock > 0;
 
       return matchesCategory && matchesSearch && matchesPrice && matchesStock;
     });
 
-    return [...result].sort((a, b) => {
-      switch (sortBy) {
-        case "PRICE_LOW":
-          return a.newPrice - b.newPrice;
-        case "PRICE_HIGH":
-          return b.newPrice - a.newPrice;
-        case "NAME_AZ":
-          return a.title.localeCompare(b.title);
-        case "FEATURED":
-        default:
-          return b.rating - a.rating; 
-      }
-    });
-  }, [allProducts, activeCategory, searchQuery, maxPrice, sortBy, inStockOnly]);
+    switch (sortBy) {
+      case "PRICE_LOW":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "PRICE_HIGH":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "NAME_AZ":
+        result.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "FEATURED":
+      default:
+        result.sort((a, b) => (b.ratingsAverage || 0) - (a.ratingsAverage || 0));
+    }
+    return result;
+  }, [products, activeCategory, searchQuery, maxPrice, sortBy, inStockOnly]);
 
-  // 6. Curated Fallback Recommendation Strategy (Top 4 Highest Rated/Featured Items)
+  // Derived Pagination slices
+  const totalPages = Math.ceil(processedProducts.length / itemsPerPage) || 1;
+  
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return processedProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [processedProducts, currentPage, itemsPerPage]);
+
   const trendingProductsFallback = useMemo(() => {
-    return [...allProducts]
-      .sort((a, b) => b.rating - a.rating)
+    return [...products]
+      .sort((a, b) => (b.ratingsAverage || 0) - (a.ratingsAverage || 0))
       .slice(0, 4);
-  }, [allProducts]);
+  }, [products]);
 
-  // Clear all states convenience macro
   const handleResetFilters = () => {
     setActiveCategory("ALL");
     setSearchQuery("");
     setMaxPrice(absoluteMaxPrice);
-    setInStockOnly(false);
     setSortBy("FEATURED");
+    setInStockOnly(false);
+    setCurrentPage(1);
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 space-y-8 animate-pulse">
+        <div className="h-20 bg-zinc-100 rounded-2xl w-2/3" />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="h-96 bg-zinc-100 rounded-2xl" />
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-80 bg-zinc-100 rounded-2xl" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <section className="min-h-screen bg-white px-4 py-12 sm:px-6 lg:px-16">
-      
-      {/* Header Area */}
-      <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-zinc-100 pb-8">
-        <div>
-          <span className="text-xs font-black uppercase tracking-[0.25em] text-zinc-400">
-            Crafton Store
-          </span>
-          <h1 className="mt-3 text-4xl font-black uppercase tracking-tight text-zinc-950 md:text-6xl">
-            Shop Collection
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-500">
-            Explore premium backpacks, travel bags, totes, and lifestyle accessories crafted for modern travel.
-          </p>
-        </div>
-
-        {/* Product Statistics Badge */}
-        <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 min-w-[140px] text-center md:text-left">
-          <p className="text-xs uppercase tracking-widest text-zinc-400">Showing</p>
-          <h3 className="mt-1 text-3xl font-black text-zinc-950">
-            {processedProducts.length}{" "}
-            <span className="text-sm font-normal text-zinc-400">of {allProducts.length}</span>
-          </h3>
-        </div>
-      </div>
-
-      {/* Toolbar Layer (Sorting & Layout Controls) */}
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4">
+    <section className="min-h-screen bg-zinc-50/50 text-zinc-900 selection:bg-black selection:text-white">
+      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         
-        {/* Active Breadcrumb Summary */}
-        <div className="flex flex-wrap items-center gap-2">
-          {activeCategory !== "ALL" && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-800">
-              Category: {activeCategory}
-              <button onClick={() => setActiveCategory("ALL")} className="hover:text-red-500 font-black ml-1">×</button>
+        {/* --- HEADER --- */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-zinc-200 pb-8 mb-12">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+              Crafton Store
             </span>
-          )}
-          {searchQuery && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-800">
-              Query: "{searchQuery}"
-              <button onClick={() => setSearchQuery("")} className="hover:text-red-500 font-black ml-1">×</button>
-            </span>
-          )}
-          {maxPrice < absoluteMaxPrice && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-800">
-              Under: ${maxPrice}
-              <button onClick={() => setMaxPrice(absoluteMaxPrice)} className="hover:text-red-500 font-black ml-1">×</button>
-            </span>
-          )}
-          {inStockOnly && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-800">
-              In Stock Only
-              <button onClick={() => setInStockOnly(false)} className="hover:text-red-500 font-black ml-1">×</button>
-            </span>
-          )}
-        </div>
-
-        {/* View Layout Controls + Sort Dropdown */}
-        <div className="flex items-center gap-4 ml-auto w-full sm:w-auto justify-between sm:justify-end">
-          
-          {/* Grid/List Toggle Switcher */}
-          <div className="flex items-center border border-zinc-200 rounded-xl overflow-hidden bg-white">
-            <button
-              onClick={() => setViewMode("GRID")}
-              className={`p-2.5 text-xs font-bold tracking-wider transition-colors ${viewMode === "GRID" ? "bg-black text-white" : "text-zinc-600 hover:bg-zinc-100"}`}
-              title="Grid View"
-            >
-              田 Grid
-            </button>
-            <button
-              onClick={() => setViewMode("LIST")}
-              className={`p-2.5 text-xs font-bold tracking-wider transition-colors ${viewMode === "LIST" ? "bg-black text-white" : "text-zinc-600 hover:bg-zinc-100"}`}
-              title="List View"
-            >
-              ☰ List
-            </button>
+            <h1 className="mt-2 text-4xl font-black uppercase tracking-tight text-zinc-900 md:text-5xl">
+              Shop Collection
+            </h1>
+            <p className="mt-3 max-w-xl text-sm text-zinc-500">
+              Explore curated, premium pieces directly sourced and dynamic.
+            </p>
           </div>
 
-          {/* Sort Controller Select input */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="sort-select" className="text-xs font-bold text-zinc-400 uppercase tracking-wider hidden md:inline">
-              Sort By:
-            </label>
-            <select
-              id="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-wider text-zinc-800 outline-none transition-all focus:border-zinc-950"
-            >
-              <option value="FEATURED">Featured / Best Rating</option>
-              <option value="PRICE_LOW">Price: Low to High</option>
-              <option value="PRICE_HIGH">Price: High to Low</option>
-              <option value="NAME_AZ">Product Name: A-Z</option>
-            </select>
+          <div className="flex items-center gap-4 self-start md:self-auto">
+            <div className="rounded-2xl border border-zinc-200 bg-white px-5 py-3 shadow-sm">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                Products Match
+              </p>
+              <h3 className="text-2xl font-black text-zinc-900 mt-0.5">
+                {processedProducts.length}
+                <span className="text-xs font-normal text-zinc-400 ml-1.5">
+                  of {products.length}
+                </span>
+              </h3>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Grid Viewport split window */}
-      <div className="flex flex-col gap-10 lg:flex-row">
-        
-        {/* Left Control Column */}
-        <aside className="w-full shrink-0 lg:w-64 space-y-8 lg:sticky lg:top-6 h-fit">
+        {/* --- MAIN LAYOUT --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
-          {/* Text Search element */}
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-zinc-400">
-              Search Products
-            </label>
-            <div className="relative">
+          {/* --- SIDEBAR FILTERS --- */}
+          <aside className="lg:sticky lg:top-8 space-y-6 bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-sm">
+            <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+              <span className="flex items-center gap-2 font-bold uppercase text-xs tracking-wider text-zinc-700">
+                <SlidersHorizontal className="w-4 h-4" /> Filters
+              </span>
+              <button
+                onClick={handleResetFilters}
+                className="text-xs flex items-center gap-1.5 text-zinc-400 hover:text-black transition-colors font-medium"
+              >
+                <RefreshCw className="w-3 h-3" /> Reset
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-zinc-500">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:border-black focus:bg-white transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Category Selector */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-zinc-500">Category</label>
+              <div className="relative">
+                <select
+                  value={activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                  className="w-full appearance-none bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-black focus:bg-white transition-all capitalize"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.toLowerCase()}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Price Filter */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <label className="font-semibold text-zinc-500">Max Price</label>
+                <span className="font-mono bg-zinc-100 px-2 py-0.5 rounded text-zinc-700 font-bold">
+                  ${maxPrice.toLocaleString()}
+                </span>
+              </div>
               <input
-                type="text"
-                placeholder="Type to search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-900 outline-none transition-all focus:border-zinc-950 focus:bg-white focus:ring-1 focus:ring-zinc-950"
+                type="range"
+                min="0"
+                max={absoluteMaxPrice}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full accent-black bg-zinc-100 h-1 rounded-lg appearance-none cursor-pointer"
               />
-              {searchQuery && (
-                <button 
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-950 text-xs font-bold"
-                >
-                  Clear
-                </button>
-              )}
             </div>
-          </div>
 
-          {/* Price Sliding Ranger component */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-black uppercase tracking-widest text-zinc-400">
-                Max Price
-              </label>
-              <span className="text-sm font-black text-zinc-950">${maxPrice}</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max={absoluteMaxPrice}
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-black cursor-pointer bg-zinc-200 h-1 rounded-lg"
-            />
-            <div className="flex justify-between text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-              <span>$0</span>
-              <span>Max: ${absoluteMaxPrice}</span>
-            </div>
-          </div>
-
-          {/* Stock Availability Toggle Switch */}
-          <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-zinc-50/50 p-3.5">
-            <div className="flex flex-col">
-              <span className="text-xs font-black uppercase tracking-wider text-zinc-700">In Stock Only</span>
-              <span className="text-[10px] text-zinc-400">Hide out of stock items</span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={inStockOnly} 
-                onChange={(e) => setInStockOnly(e.target.checked)}
-                className="sr-only peer" 
-              />
-              <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+            {/* Stock Toggle */}
+            <label className="flex items-center gap-3 cursor-pointer pt-2 group select-none">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => setInStockOnly(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
+              </div>
+              <span className="text-xs font-medium text-zinc-600 group-hover:text-black transition-colors">
+                In Stock Only
+              </span>
             </label>
-          </div>
+          </aside>
 
-          {/* Vertical Navigation Categories stack */}
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-zinc-400 block mb-3">
-              Categories
-            </label>
-            <div className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 text-left w-auto lg:w-full ${
-                    activeCategory === category
-                      ? "bg-black text-white"
-                      : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 lg:bg-transparent lg:hover:bg-zinc-50 lg:text-zinc-500 lg:hover:text-zinc-950"
-                  }`}
+          {/* --- PRODUCTS WRAPPER --- */}
+          <div className="lg:col-span-3 space-y-6">
+            
+            {/* Toolbar Controls */}
+            <div className="flex items-center justify-between bg-white p-3 rounded-2xl border border-zinc-200/80 shadow-sm">
+              <div className="relative w-48">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full appearance-none bg-transparent pl-3 pr-8 py-1.5 text-xs font-semibold tracking-wide text-zinc-700 focus:outline-none cursor-pointer"
                 >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Reset Filters Trigger button */}
-          {(activeCategory !== "ALL" || searchQuery !== "" || maxPrice !== absoluteMaxPrice || inStockOnly || sortBy !== "FEATURED") && (
-            <button
-              onClick={handleResetFilters}
-              className="w-full text-center text-xs font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors border border-dashed border-red-200 hover:border-red-300 rounded-xl py-3"
-            >
-              Reset All Filters
-            </button>
-          )}
-        </aside>
-
-        {/* Right Output Window panel viewport */}
-        <main className="flex-1">
-          {processedProducts.length > 0 ? (
-            <div className={
-              viewMode === "GRID" 
-                ? "grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3" 
-                : "flex flex-col gap-4"
-            }>
-              {processedProducts.map((product) => (
-                <div 
-                  key={product.id} 
-                  className={viewMode === "LIST" ? "w-full max-w-none border-b border-zinc-100 pb-4" : ""}
-                >
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* Upgraded Smart Empty State Container */
-            <div className="space-y-12">
-              <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl border border-dashed border-zinc-200 bg-zinc-50/50 px-4">
-                <span className="text-4xl animate-pulse">🔍</span>
-                <h3 className="mt-4 text-lg font-black text-zinc-950 uppercase tracking-wide">
-                  No products found
-                </h3>
-                <p className="mt-2 text-sm text-zinc-500 max-w-xs leading-relaxed">
-                  We couldn't find matches for your active filters. Try clearing parameters or browse our trending catalog below.
-                </p>
-                <button
-                  onClick={handleResetFilters}
-                  className="mt-6 rounded-xl bg-black px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-zinc-800 active:scale-95"
-                >
-                  Clear All Filters
-                </button>
+                  <option value="FEATURED">Sort: Featured</option>
+                  <option value="PRICE_LOW">Price: Low to High</option>
+                  <option value="PRICE_HIGH">Price: High to Low</option>
+                  <option value="NAME_AZ">Name: A to Z</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
               </div>
 
-              {/* Dynamic Fallback: "Trending Alternatives Panel" */}
-              <div className="space-y-6 pt-4 border-t border-zinc-100">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">
-                    Don't leave empty-handed
-                  </span>
-                  <h2 className="text-xl font-black uppercase tracking-tight text-zinc-950">
-                    Our Best Sellers & Trending Picks
-                  </h2> 
-                  
+              {/* Items Per Page Option */}
+              <div className="relative flex items-center gap-2 border-l border-zinc-200 pl-4 text-xs text-zinc-500 font-semibold">
+                <span>View</span>
+                <div className="relative">
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                    className="appearance-none bg-zinc-100 pl-3 pr-7 py-1 rounded-lg text-zinc-800 font-bold focus:outline-none cursor-pointer text-xs"
+                  >
+                    <option value={12}>12</option>
+                    <option value={24}>24</option>
+                    <option value={48}>48</option>
+                  </select>
+                  <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-500 pointer-events-none" />
                 </div>
-                
-                {/* Fallback Display items stream (Always forced to Grid for styling stability) */}
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-                  {trendingProductsFallback.map((product) => (
-                    <ProductCard key={`fallback-${product.id}`} product={product} />
+              </div>
+            </div>
+
+            {/* Grid Rendering */}
+            {paginatedProducts.length > 0 ? (
+              <div className="space-y-10">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 transition-all duration-300">
+                  {paginatedProducts.map((product) => (
+                    <div key={product._id} className="transform hover:-translate-y-1 transition-transform duration-300">
+                      <ProductCard product={product} />
+                    </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          )}
-        </main>
 
+                {/* --- PAGINATION CONTROLS --- */}
+                <div className="flex items-center justify-between border-t border-zinc-200/80 pt-6">
+                  <p className="text-xs font-medium text-zinc-500">
+                    Showing <span className="text-zinc-800 font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                    <span className="text-zinc-800 font-bold">
+                      {Math.min(currentPage * itemsPerPage, processedProducts.length)}
+                    </span>{" "}
+                    of <span className="text-zinc-800 font-bold">{processedProducts.length}</span> results
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="p-2 border border-zinc-200 rounded-xl bg-white hover:bg-zinc-50 text-zinc-600 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
+                      {[...Array(totalPages)].map((_, index) => {
+                        const pageNum = index + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-9 h-9 text-xs font-bold rounded-xl transition-all ${
+                              currentPage === pageNum
+                                ? "bg-black text-white"
+                                : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="p-2 border border-zinc-200 rounded-xl bg-white hover:bg-zinc-50 text-zinc-600 disabled:opacity-40 disabled:hover:bg-white transition-colors"
+                      aria-label="Next page"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              
+              /* --- EMPTY STATE SECTION --- */
+              <div className="bg-white rounded-2xl border border-zinc-200/80 p-8 text-center space-y-12">
+                <div className="max-w-sm mx-auto flex flex-col items-center justify-center pt-8">
+                  <div className="p-4 bg-zinc-50 text-zinc-400 rounded-full mb-4">
+                    <AlertCircle className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-zinc-900">No matching products</h3>
+                  <p className="text-zinc-500 text-sm mt-2">
+                    We couldn't find anything matching your exact filter combination. Try clearing your constraints.
+                  </p>
+                  <button
+                    onClick={handleResetFilters}
+                    className="mt-5 text-xs bg-black text-white font-bold tracking-wider uppercase px-5 py-2.5 rounded-xl hover:bg-zinc-800 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+
+                {/* Fallback Recommendations block */}
+                <div className="border-t border-zinc-100 pt-8 text-left">
+                  <div className="mb-6">
+                    <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                      Alternative Picks
+                    </span>
+                    <h4 className="text-lg font-black uppercase text-zinc-900 mt-1">
+                      Trending Products
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {trendingProductsFallback.map((product) => (
+                      <ProductCard key={product._id} product={product} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -11,24 +11,89 @@ const createSlug = (value) =>
     .replace(/(^-|-$)/g, "");
 
 export const getProducts = asyncHandler(async (req, res) => {
-  const { category, featured, search, page = 1, limit = 12 } = req.query;
-  const filter = { isActive: true };
+  const {
+    category,
+    featured,
+    isFeatured,
+    search,
+    page = 1,
+    limit = 10000,
+    inStock,
+    sort,
+    maxPrice,
+  } = req.query;
 
-  if (category) filter.category = category;
-  if (featured !== undefined) filter.featured = featured === "true";
-  if (search) filter.name = { $regex: search, $options: "i" };
+  const filter = {};
 
-  const numericLimit = Math.min(Number(limit), 50);
-  const skip = (Number(page) - 1) * numericLimit;
+  if (category) {
+    filter.category = category;
+  }
 
-  const [products, total] = await Promise.all([
-    Product.find(filter)
-      .populate("category", "name slug")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(numericLimit),
-    Product.countDocuments(filter),
-  ]);
+  const featuredValue =
+    featured !== undefined
+      ? featured
+      : isFeatured;
+
+  if (featuredValue !== undefined) {
+    filter.isFeatured =
+      featuredValue === "true";
+  }
+
+  if (search) {
+    filter.title = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+
+  if (inStock === "true") {
+    filter.stock = { $gt: 0 };
+  }
+
+  if (maxPrice) {
+    filter.price = {
+      $lte: Number(maxPrice),
+    };
+  }
+
+  let sortQuery = {
+    createdAt: -1,
+  };
+
+  if (sort === "price_asc")
+    sortQuery = { price: 1 };
+
+  if (sort === "price_desc")
+    sortQuery = { price: -1 };
+
+  if (sort === "rating")
+    sortQuery = {
+      ratingsAverage: -1,
+    };
+
+  if (sort === "newest")
+    sortQuery = {
+      createdAt: -1,
+    };
+
+  const numericLimit = Math.min(
+    Number(limit),
+    50
+  );
+
+  const skip =
+    (Number(page) - 1) *
+    numericLimit;
+
+  const [products, total] =
+    await Promise.all([
+      Product.find(filter)
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(numericLimit),
+
+      Product.countDocuments(filter),
+    ]);
 
   res.json({
     success: true,
@@ -38,7 +103,9 @@ export const getProducts = asyncHandler(async (req, res) => {
         page: Number(page),
         limit: numericLimit,
         total,
-        pages: Math.ceil(total / numericLimit),
+        pages: Math.ceil(
+          total / numericLimit
+        ),
       },
     },
   });
@@ -54,7 +121,7 @@ export const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findOne({
     $or: lookup,
     isActive: true,
-  }).populate("category", "name slug");
+  });
 
   if (!product) throw new ApiError(404, "Product not found");
 
@@ -64,7 +131,7 @@ export const getProduct = asyncHandler(async (req, res) => {
 export const createProduct = asyncHandler(async (req, res) => {
   const product = await Product.create({
     ...req.body,
-    slug: req.body.slug || createSlug(req.body.name),
+    slug: req.body.slug || createSlug(req.body.title),
   });
 
   res.status(201).json({
@@ -77,8 +144,8 @@ export const createProduct = asyncHandler(async (req, res) => {
 export const updateProduct = asyncHandler(async (req, res) => {
   const update = { ...req.body };
 
-  if (update.name && !update.slug) {
-    update.slug = createSlug(update.name);
+  if (update.title && !update.slug) {
+    update.slug = createSlug(update.title);
   }
 
   const product = await Product.findByIdAndUpdate(req.params.id, update, {

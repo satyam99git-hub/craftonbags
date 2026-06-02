@@ -14,7 +14,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import productsData from "../../data/product";
+import { getProducts } from "../../api/productApi";
 
 import {
   useWishlist,
@@ -33,29 +33,56 @@ const FeaturedProducts = () => {
   const { isAuthenticated } =
     useAuth();
 
+  const [products, setProducts] =
+    useState([]);
+
   const [offset, setOffset] =
     useState(0);
 
   const [isPaused, setIsPaused] =
     useState(false);
 
+  const [loading, setLoading] =
+    useState(true);
+
   const trackRef = useRef(null);
 
-  // Featured Products
-  const featuredProducts =
-    productsData.filter(
-      (product) => product.featured
-    );
+  // Fetch Featured Products
+  
+  useEffect(() => {
+    const fetchFeaturedProducts =
+      async () => {
+        try {
+          const data =
+            await getProducts({
+              isFeatured: true,
+            });
+          setProducts(
+            data.products || []
+          );
+        } catch (error) {
+          console.error(
+            "Failed to fetch featured products:",
+            error
+          );
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  // Infinite Loop
+    fetchFeaturedProducts();
+  }, []);
+
   const loopProducts = [
-    ...featuredProducts,
-    ...featuredProducts,
-    ...featuredProducts,
+    ...products,
+    ...products,
+    ...products,
   ];
 
   // Auto Slider
   useEffect(() => {
+    if (!products.length) return;
+
     let animationFrameId;
 
     const animate = () => {
@@ -86,9 +113,8 @@ const FeaturedProducts = () => {
       cancelAnimationFrame(
         animationFrameId
       );
-  }, [isPaused]);
+  }, [isPaused, products]);
 
-  // Check Wishlist
   const isInWishlist = (
     productSlug
   ) => {
@@ -98,14 +124,20 @@ const FeaturedProducts = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <section className="py-20 text-center">
+        Loading products...
+      </section>
+    );
+  }
+
   return (
     <section className="relative overflow-hidden bg-stone-50 py-20">
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 lg:px-16">
 
         {/* Header */}
         <div className="mb-12 flex items-center justify-between">
-
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-700">
               Curated Collection
@@ -129,7 +161,6 @@ const FeaturedProducts = () => {
               className="transition-transform duration-300 group-hover:translate-x-1"
             />
           </button>
-
         </div>
 
         {/* Slider */}
@@ -142,8 +173,6 @@ const FeaturedProducts = () => {
             setIsPaused(false)
           }
         >
-
-          {/* Track */}
           <div
             ref={trackRef}
             className="flex w-max gap-6"
@@ -151,14 +180,13 @@ const FeaturedProducts = () => {
               transform: `translateX(-${offset}px)`,
             }}
           >
-
             {loopProducts.map(
               (
                 product,
                 index
               ) => (
                 <article
-                  key={`${product.slug}-${index}`}
+                  key={`${product._id}-${index}`}
                   onClick={() =>
                     navigate(
                       `/product/${product.slug}`
@@ -166,13 +194,12 @@ const FeaturedProducts = () => {
                   }
                   className="group relative flex w-[320px] cursor-pointer flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
                 >
-
                   {/* Image */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
-
                     <img
                       src={
-                        product.image
+                        product.images?.[0]
+                          ?.url
                       }
                       alt={
                         product.title
@@ -180,14 +207,12 @@ const FeaturedProducts = () => {
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
-                    {/* Wishlist */}
                     {isAuthenticated && (
                       <button
                         onClick={(
                           e
                         ) => {
                           e.preventDefault();
-
                           e.stopPropagation();
 
                           toggleWishlist(
@@ -208,12 +233,10 @@ const FeaturedProducts = () => {
                         />
                       </button>
                     )}
-
                   </div>
 
                   {/* Content */}
                   <div className="p-5">
-
                     <span className="text-xs uppercase text-zinc-400">
                       {
                         product.category
@@ -232,11 +255,8 @@ const FeaturedProducts = () => {
                       }
                     </p>
 
-                    {/* Bottom */}
                     <div className="mt-5 flex items-center justify-between">
-
                       <div>
-
                         <span className="text-xl font-black">
                           ₹
                           {
@@ -252,11 +272,9 @@ const FeaturedProducts = () => {
                             }
                           </span>
                         )}
-
                       </div>
 
                       <div className="flex items-center gap-1">
-
                         <Star
                           size={14}
                           className="fill-amber-400 text-amber-400"
@@ -264,19 +282,15 @@ const FeaturedProducts = () => {
 
                         <span className="text-sm font-bold">
                           {
-                            product.rating
+                            product.ratingsAverage
                           }
                         </span>
-
                       </div>
-
                     </div>
-
                   </div>
                 </article>
               )
             )}
-
           </div>
         </div>
       </div>
